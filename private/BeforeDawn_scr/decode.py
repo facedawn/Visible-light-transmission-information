@@ -55,6 +55,7 @@ def decode(file_path, output_path):
 
     now_index = -1
     max_index = 0
+    index = 0
     ans = ''
     ret = True
 
@@ -62,31 +63,37 @@ def decode(file_path, output_path):
         if frame is None:
             break
         if ret == True:
+            str = ""
             result = get_qrcode_result(frame, binary_max=230, binary_step=2)
-            str = result[0].data.decode('utf-8')
+            if len(result) > 0:
+                str = result[0].data.decode('utf-8')
             # print(str)
-
-            if now_index == -1:
-                # 获取头信息，顺便进行版本检测，以防因为版本问题导致读取错误。
-                str = str.split('#')
-                if len(str) >= 2:
-                    if int(str[0]) > 0 and str[1] == 'made by Moyulingjiu, 2021':
+            if len(str) != 0:
+                if now_index == -1:
+                    # 获取头信息，顺便进行版本检测，以防因为版本问题导致读取错误。
+                    str = str.split('#')
+                    if len(str) >= 2:
+                        if int(str[0]) > 0 and str[1] == 'made by Moyulingjiu, 2021':
+                            max_index = int(str[0])
+                            now_index = 0
+                    elif int(str[0]) > 0:
                         max_index = int(str[0])
                         now_index = 0
-                elif int(str[0]) > 0:
-                    max_index = int(str[0])
-                    now_index = 0
-            else:
-                if now_index >= max_index:
-                    break
+                        print('共计', max_index, '个二维码')
                 else:
-                    str_temp = str.split('#')
-                    if len(str_temp) >= 2:
-                        # 这里要用大于等于，因为中间的一页可能漏掉了，因为各种干扰导致未能识别。
-                        if int(str_temp[0]) >= now_index:
-                            ans += str[len(str_temp[0]) + 1:]
-                            now_index = int(str_temp[0]) + 1
+                    if now_index >= max_index:
+                        break
+                    else:
+                        str_temp = str.split('#')
+                        if len(str_temp) >= 2:
+                            # 这里要用大于等于，因为中间的一页可能漏掉了，因为各种干扰导致未能识别。
+                            if int(str_temp[0]) >= now_index:
+                                ans += str[len(str_temp[0]) + 1:]
+                                now_index = int(str_temp[0]) + 1
+                                print('当前', now_index, '个二维码')
         ret, frame = vc.read()
+        print('第', index, '帧')
+        index += 1
     f = open(output_path, 'w', encoding='utf-8')
     f.write(ans)
     f.close()
