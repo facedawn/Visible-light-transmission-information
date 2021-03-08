@@ -119,7 +119,7 @@ def Data2Video(file, fps):
 
     schedule(0)
 
-    image = makeQR(str(page))
+    image = makeQR(str(page) + '#made by Moyulingjiu, 2021')
     image = cv2.cvtColor(
         255 * np.asarray(image).astype('uint8'), cv2.COLOR_RGB2BGR)
     img_array.append(image)
@@ -185,6 +185,8 @@ def main():
         if choice != 'y' and choice != 'Y':
             playVideo(10)
             return
+        else:
+            os.remove("demo.avi")
 
     noticeFileName = input('Please input the information to be sent to the original file:')
     fps = int(input('Please enter fps (positive integer):'))
