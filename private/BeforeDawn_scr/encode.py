@@ -119,13 +119,8 @@ def Data2Video(file, fps):
 
     schedule(0)
 
-    image = makeQR(str(page) + '#made by Moyulingjiu, 2021')
-    image = cv2.cvtColor(
-        255 * np.asarray(image).astype('uint8'), cv2.COLOR_RGB2BGR)
-    img_array.append(image)
-
     for i in range(0, page):
-        image = makeQR(str(i) + '#' + data_list[i])
+        image = makeQR(str(i) + '#' + str(page) + '#' + data_list[i])
         image = cv2.cvtColor(
             255 * np.asarray(image).astype('uint8'), cv2.COLOR_RGB2BGR)
         img_array.append(image)
