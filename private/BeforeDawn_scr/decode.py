@@ -53,8 +53,8 @@ def decode(file_path, output_path):
     else:
         isOpen = False
 
-    now_index = -1
-    max_index = 0
+    now_index = 0
+    max_index = 5
     index = 0
     ans = ''
     ret = True
@@ -69,28 +69,17 @@ def decode(file_path, output_path):
                 str = result[0].data.decode('utf-8')
             # print(str)
             if len(str) != 0:
-                if now_index == -1:
-                    # 获取头信息，顺便进行版本检测，以防因为版本问题导致读取错误。
-                    str = str.split('#')
-                    if len(str) >= 2:
-                        if int(str[0]) > 0 and str[1] == 'made by Moyulingjiu, 2021':
-                            max_index = int(str[0])
-                            now_index = 0
-                    elif int(str[0]) > 0:
-                        max_index = int(str[0])
-                        now_index = 0
-                        print('共计', max_index, '个二维码')
+                if now_index >= max_index:
+                    break
                 else:
-                    if now_index >= max_index:
-                        break
-                    else:
-                        str_temp = str.split('#')
-                        if len(str_temp) >= 2:
-                            # 这里要用大于等于，因为中间的一页可能漏掉了，因为各种干扰导致未能识别。
-                            if int(str_temp[0]) >= now_index:
-                                ans += str[len(str_temp[0]) + 1:]
-                                now_index = int(str_temp[0]) + 1
-                                print('当前', now_index, '个二维码')
+                    str_temp = str.split('#')
+                    if len(str_temp) >= 3:
+                        # 这里要用大于等于，因为中间的一页可能漏掉了，因为各种干扰导致未能识别。
+                        if int(str_temp[0]) >= now_index:
+                            max_index = int(str_temp[1])
+                            ans += str[len(str_temp[0]) + len(str_temp[1]) + 2:]
+                            now_index = int(str_temp[0]) + 1
+                            print('当前', now_index, '个二维码')
         ret, frame = vc.read()
         print('第', index, '帧')
         index += 1
