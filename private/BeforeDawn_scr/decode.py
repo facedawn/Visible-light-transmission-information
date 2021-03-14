@@ -45,6 +45,8 @@ def get_qrcode_result(image_input, binary_max=230, binary_step=2):
 
 
 def decode(file_path, output_path):
+    output_path = 'out.txt' if len(output_path) == 0 else output_path
+
     vc = cv2.VideoCapture(file_path)
 
     # 检测是否打开，打开了第一个open存储是否打开，frame取一帧的图像
@@ -54,38 +56,56 @@ def decode(file_path, output_path):
         isOpen = False
 
     now_index = 0
-    max_index = 5
+    max_index = 1
     index = 0
     ans = ''
     ret = True
+    lose_frame = 0
 
     while isOpen:
         if frame is None:
             break
         if ret == True:
-            str = ""
-            result = get_qrcode_result(frame, binary_max=230, binary_step=2)
-            if len(result) > 0:
-                str = result[0].data.decode('utf-8')
-            # print(str)
-            if len(str) != 0:
-                if now_index >= max_index:
-                    break
-                else:
-                    str_temp = str.split('#')
-                    if len(str_temp) >= 3:
-                        # 这里要用大于等于，因为中间的一页可能漏掉了，因为各种干扰导致未能识别。
-                        if int(str_temp[0]) >= now_index:
-                            max_index = int(str_temp[1])
-                            ans += str[len(str_temp[0]) + len(str_temp[1]) + 2:]
-                            now_index = int(str_temp[0]) + 1
-                            print('当前', now_index, '个二维码')
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # results = get_qrcode_result(frame, binary_max=230, binary_step=2)
+            results = pyzbar.decode(frame)
+            for result in results:
+                str = result.data.decode('utf-8')
+                (x, y, w, h) = result.rect
+                frame = cv2.rectangle(
+                    frame, (x, y), (x + w, y + h), (0, 0, 0), 10)
+
+                width = 800
+                height = 800
+                frame = cv2.resize(frame, (width, height),)
+                cv2.resizeWindow('result', width, height)
+                cv2.moveWindow("result", 1000, 100)
+                cv2.imshow('result', frame)
+                cv2.waitKey(10)
+
+                if len(str) != 0:
+                    if now_index >= max_index:
+                        break
+                    else:
+                        str_temp = str.split('#')
+                        if len(str_temp) >= 3:
+                            # 这里要用大于等于，因为中间的一页可能漏掉了，因为各种干扰导致未能识别。
+                            if int(str_temp[0]) >= now_index:
+                                if int(str_temp[0]) > now_index:
+                                    lose_frame += int(str_temp[0])-now_index
+                                max_index = int(str_temp[1])
+                                ans += str[len(str_temp[0]) +
+                                        len(str_temp[1]) + 2:]
+                                now_index = int(str_temp[0]) + 1
+                                print('当前', now_index, '个二维码')
         ret, frame = vc.read()
-        print('第', index, '帧')
         index += 1
     f = open(output_path, 'w', encoding='utf-8')
     f.write(ans)
     f.close()
+
+    print('预估会接受到的二维码数：', max_index)
+    print('合计丢失二维码数：', lose_frame)
     return True
 
 # ====================================================

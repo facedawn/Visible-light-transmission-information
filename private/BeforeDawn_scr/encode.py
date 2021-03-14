@@ -146,10 +146,10 @@ def playVideo(fps):
     wait_second = int(1000/fps)
     
     ret, frame = vc.read()
-    cv2.namedWindow("reslut", 0)
-    cv2.resizeWindow("reslut", int(
+    cv2.namedWindow("result", 0)
+    cv2.resizeWindow("result", int(
         width * (height - 80) / height), height - 80)
-    cv2.imshow('reslut', frame)
+    cv2.imshow('result', frame)
     print('Press any key to start!')
     cv2.waitKey(0)
 
@@ -159,11 +159,11 @@ def playVideo(fps):
             break
         if ret == True:
             # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            # cv2.imshow('reslut', gray)
-            cv2.namedWindow("reslut", 0)
-            cv2.resizeWindow("reslut", int(
+            # cv2.imshow('result', gray)
+            cv2.namedWindow("result", 0)
+            cv2.resizeWindow("result", int(
                 width * (height - 80) / height), height - 80)
-            cv2.imshow('reslut', frame)
+            cv2.imshow('result', frame)
             if cv2.waitKey(wait_second) & 0xFF == 27:
                 break
 
