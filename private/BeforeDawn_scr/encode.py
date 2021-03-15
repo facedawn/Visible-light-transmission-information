@@ -141,11 +141,10 @@ def playVideo(fps):
     if vc.isOpened():
         isOpen, frame = vc.read()
     else:
-        isOpen = False
+        return
 
     wait_second = int(1000/fps)
     
-    ret, frame = vc.read()
     cv2.namedWindow("result", 0)
     cv2.resizeWindow("result", int(
         width * (height - 80) / height), height - 80)
