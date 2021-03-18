@@ -1,24 +1,25 @@
-ï»¿#include <opencv2/opencv.hpp>
+#include "QRCode.h"
+#include <opencv2/opencv.hpp>
 #include <iostream>
 #include <random>
 #include <vector>
+#include "Buffer.h"
 
 using namespace cv;
 using namespace std;
 
 //=======================================
-//æ•°æ®å®šä¹‰
+//Êı¾İ¶¨Òå
 //=======================================
-#define WihtePadding 30        //ç™½è¾¹åƒç´ 
-#define NumberofColorBlocks 79 //çŸ©é˜µå¤§å°ï¼ˆè¾¹é•¿ï¼‰ï¼ˆåº”æ»¡è¶³ä¸¤ç‚¹ï¼š1ã€å¤§å°ä¸èƒ½å°äº21,2ã€ä¸ºå¥‡æ•°ï¼‰
-#define Numbmerofpixels 5      //å•ä¸ªç‚¹å¯¹åº”çš„åƒç´ 
+#define WihtePadding 30        //°×±ßÏñËØ
+#define NumberofColorBlocks 79 //¾ØÕó´óĞ¡£¨±ß³¤£©£¨Ó¦Âú×ãÁ½µã£º1¡¢´óĞ¡²»ÄÜĞ¡ÓÚ21,2¡¢ÎªÆæÊı£©
+#define Numbmerofpixels 5      //µ¥¸öµã¶ÔÓ¦µÄÏñËØ
 #define LinePixels (Numbmerofpixels * NumberofColorBlocks + 2 * WihtePadding)
-#define DataContain (NumberofColorBlocks * NumberofColorBlocks - 217 - 30 - (NumberofColorBlocks - 16) * 2) //å¯ä»¥å‚¨å­˜çš„æ•°æ®é‡ï¼Œ217ä¸ºå®šä½ç‚¹å ç”¨ï¼Œ30ä¸ºç‰ˆæœ¬ä¿¡æ¯
+#define DataContain (NumberofColorBlocks * NumberofColorBlocks - 217 - 30 - (NumberofColorBlocks - 16) * 2) //¿ÉÒÔ´¢´æµÄÊı¾İÁ¿£¬217Îª¶¨Î»µãÕ¼ÓÃ£¬30Îª°æ±¾ĞÅÏ¢
 
-int matrix[NumberofColorBlocks][NumberofColorBlocks]; //äºŒç»´ç ä¿¡æ¯ï¼ˆè¿™æ˜¯ä¸€ä¸ªæ²¡æœ‰å†—ä½™çš„æ•°ç»„ï¼ï¼‰
-vector<Vec3b> rgb_pixels;                             //åˆ›å»º rgbåƒç´ ç‚¹åˆ—è¡¨
-//å¤§å®šä½ç‚¹
-int bigAnchorPoint[8][8] = {
+int matrix[NumberofColorBlocks][NumberofColorBlocks]; //¶şÎ¬ÂëĞÅÏ¢£¨ÕâÊÇÒ»¸öÃ»ÓĞÈßÓàµÄÊı×é£¡£©
+//´ó¶¨Î»µã
+const int bigAnchorPoint[8][8] = {
     1, 1, 1, 1, 1, 1, 1, 0,
     1, 0, 0, 0, 0, 0, 1, 0,
     1, 0, 1, 1, 1, 0, 1, 0,
@@ -27,52 +28,50 @@ int bigAnchorPoint[8][8] = {
     1, 0, 0, 0, 0, 0, 1, 0,
     1, 1, 1, 1, 1, 1, 1, 0,
     0, 0, 0, 0, 0, 0, 0, 0 };
-//å°å®šä½ç‚¹
-int smallAnchorPoint[5][5] = {
+//Ğ¡¶¨Î»µã
+const int smallAnchorPoint[5][5] = {
     1, 1, 1, 1, 1,
     1, 0, 0, 0, 1,
     1, 0, 1, 0, 1,
     1, 0, 0, 0, 1,
     1, 1, 1, 1, 1 };
-//ç‰ˆæœ¬ä¿¡æ¯ï¼ˆ101 1010 1010 0101ï¼‰
-char version[15] = {
+//°æ±¾ĞÅÏ¢£¨101 1010 1010 0101£©
+const char version[15] = {
     1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1 };
 
 //=======================================
-//å£°æ˜å‡½æ•°
-//=======================================
-void writeData();
-void QRCodeBasic();
-void QRCode();
-void Xor();
-
-//=======================================
-//ä¸»ä½“éƒ¨åˆ†
+//Ö÷Ìå²¿·Ö
 //=======================================
 
-//ç”ŸæˆäºŒç»´ç 
-void QRCode()
+QRCode::QRCode()
 {
+    //³õÊ¼»¯
+    rgb_pixels.push_back({ 255, 255, 255 }); //0--°×É«
+    rgb_pixels.push_back({ 0, 0, 0 });       //1--ºÚÉ«
+}
 
-    //åˆå§‹åŒ–å›¾ç‰‡å¹¶èµ‹å€¼ä¸ºç™½è‰²
+//Éú³É¶şÎ¬Âë
+void QRCode::getQRCode()
+{
+    //³õÊ¼»¯Í¼Æ¬²¢¸³ÖµÎª°×É«
     Mat img(LinePixels, LinePixels, CV_8UC3, Scalar(255, 255, 255));
 
-    //å¡«å†™åŸºç¡€ä¿¡æ¯
+    //ÌîĞ´»ù´¡ĞÅÏ¢
     QRCodeBasic();
-    cout << "å¯ä»¥å‚¨å­˜çš„äºŒè¿›åˆ¶ä½æ•°ï¼š" << DataContain << endl;
+    cout << "¿ÉÒÔ´¢´æµÄ¶ş½øÖÆÎ»Êı£º" << DataContain << endl;
 
-    //å†™å…¥æ•°æ®
+    //Ğ´ÈëÊı¾İ
     //writeData();
 
-    //å¼‚æˆ–è¿ç®—
-    Xor();
+    //Òì»òÔËËã
+    //Xor();
 
-    //å†™å…¥å›¾ç‰‡
+    //Ğ´ÈëÍ¼Æ¬
     for (int i = 0; i < NumberofColorBlocks; i++)
     {
         for (int j = 0; j < NumberofColorBlocks; j++)
         {
-            //å†™å…¥å•ä¸ª0ã€1
+            //Ğ´Èëµ¥¸ö0¡¢1
             for (int p = 0; p < Numbmerofpixels; p++)
             {
                 for (int q = 0; q < Numbmerofpixels; q++)
@@ -89,11 +88,11 @@ void QRCode()
     waitKey(0);
 }
 
-//æ·»åŠ äºŒç»´ç çš„åŸºç¡€ä¿¡æ¯ï¼ˆå®šä½ç‚¹ã€çŸ«æ­£å›¾ã€æ ¼å¼ç‚¹ï¼‰
-void QRCodeBasic()
+//Ìí¼Ó¶şÎ¬ÂëµÄ»ù´¡ĞÅÏ¢£¨¶¨Î»µã¡¢½ÃÕıÍ¼¡¢¸ñÊ½µã£©
+void QRCode::QRCodeBasic()
 {
     int i, j;
-    //å…¨éƒ¨æ ‡ä¸Š-1ï¼Œä»£è¡¨æ²¡æœ‰æ•°æ®ï¼ˆ-1å°†ä¼šè¢«å½“ä½œä¸º0è¾“å‡ºåœ¨å›¾ç‰‡é‡Œï¼‰
+    //È«²¿±êÉÏ-1£¬´ú±íÃ»ÓĞÊı¾İ£¨-1½«»á±»µ±×÷Îª0Êä³öÔÚÍ¼Æ¬Àï£©
     for (i = 0; i < NumberofColorBlocks; i++)
     {
         for (j = 0; j < NumberofColorBlocks; j++)
@@ -102,7 +101,7 @@ void QRCodeBasic()
         }
     }
 
-    //å¡«è¡¥å¤§å®šä½ç‚¹
+    //Ìî²¹´ó¶¨Î»µã
     for (i = 0; i < 8; i++)
     {
         for (j = 0; j < 8; j++)
@@ -112,7 +111,7 @@ void QRCodeBasic()
             matrix[i][NumberofColorBlocks - 1 - j] = bigAnchorPoint[i][j];
         }
     }
-    //å¡«è¡¥å°å®šä½ç‚¹
+    //Ìî²¹Ğ¡¶¨Î»µã
     for (i = 0; i < 5; i++)
     {
         for (j = 0; j < 5; j++)
@@ -120,13 +119,13 @@ void QRCodeBasic()
             matrix[NumberofColorBlocks - 5 - i][NumberofColorBlocks - 5 - j] = smallAnchorPoint[i][j];
         }
     }
-    //å¡«è¡¥å®šä½ç‚¹
+    //Ìî²¹¶¨Î»µã
     for (i = 8; i < NumberofColorBlocks - 8; i++)
     {
         matrix[6][i] = (i + 1) % 2;
         matrix[i][6] = (i + 1) % 2;
     }
-    //å¡«å†™ç‰ˆæœ¬ä¿¡æ¯
+    //ÌîĞ´°æ±¾ĞÅÏ¢
     for (i = 0; i < 8; i++)
     {
         if (i > 1)
@@ -144,8 +143,8 @@ void QRCodeBasic()
     matrix[8][7] = version[14];
 }
 
-//å†™å…¥æ•°æ®
-void writeData()
+//Ğ´ÈëÊı¾İ
+void QRCode::writeData()
 {
     for (int i = 0; i < NumberofColorBlocks; i++)
     {
@@ -157,7 +156,7 @@ void writeData()
     }
 }
 
-void Xor()
+void QRCode::Xor()
 {
     int i, j;
     for (i = 9; i < NumberofColorBlocks - 9; i++)
@@ -165,13 +164,13 @@ void Xor()
         for (j = 0; j < 6; j++)
         {
             int cover = (i + j + 1) % 2;
-            //å·¦
+            //×ó
             int compare = (matrix[i][j] == -1) ? 0 : matrix[i][j];
             if (compare == cover)
                 matrix[i][j] = 0;
             else
                 matrix[i][j] = 1;
-            //ä¸Š
+            //ÉÏ
             compare = (matrix[j][i] == -1) ? 0 : matrix[j][i];
             if (compare == cover)
                 matrix[j][i] = 0;
@@ -184,13 +183,13 @@ void Xor()
         for (j = 7; j < 9; j++)
         {
             int cover = (i + j + 1) % 2;
-            //å·¦
+            //×ó
             int compare = (matrix[i][j] == -1) ? 0 : matrix[i][j];
             if (compare == cover)
                 matrix[i][j] = 0;
             else
                 matrix[i][j] = 1;
-            //ä¸Š
+            //ÉÏ
             compare = (matrix[j][i] == -1) ? 0 : matrix[j][i];
             if (compare == cover)
                 matrix[j][i] = 0;
@@ -211,7 +210,7 @@ void Xor()
     {
         for (j = 8; j < NumberofColorBlocks; j++)
         {
-            if (i > NumberofColorBlocks - 10 && i < NumberofColorBlocks - 4) //å»é™¤å°å®šä½ç‚¹
+            if (i > NumberofColorBlocks - 10 && i < NumberofColorBlocks - 4) //È¥³ıĞ¡¶¨Î»µã
                 if (j > NumberofColorBlocks - 10 && j < NumberofColorBlocks - 4)
                     continue;
             int cover = (i + j + 1) % 2;
@@ -222,14 +221,4 @@ void Xor()
                 matrix[i][j] = 1;
         }
     }
-}
-
-int main(int argc, char** argv)
-{
-    //åˆå§‹åŒ–
-    rgb_pixels.push_back({ 255, 255, 255 }); //0--ç™½è‰²
-    rgb_pixels.push_back({ 0, 0, 0 });       //1--é»‘è‰²
-
-    //æ‰§è¡Œ
-    QRCode();
 }
