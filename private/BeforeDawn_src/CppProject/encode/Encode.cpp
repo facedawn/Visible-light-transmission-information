@@ -25,8 +25,10 @@ bool Encode::data2Video()
 	QRCode qr(&buffer);
 	while (!qr.isEnd())
 	{
-		Mat img = qr.getQRCode();    
-		imshow("img", img);
-		waitKey(0);
+		Mat img = qr.getQRCode();
+		video.append(img);
 	}
+	bool result = video.saveVideo();
+	video.playVideo();
+	return result;
 }

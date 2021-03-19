@@ -13,7 +13,6 @@ using namespace cv;
 class Encode
 {
 	DataBuffer buffer;
-	vector<Mat> img;
 	Video video;
 public:
 	Encode();

@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     cout << "请输入文件名：";
     string filename;
     cin >> filename;
-    cout << "请输入视频文件名（无需带格式，自动生成avi格式）：";
+    cout << "请输入视频文件名（mp4格式！）：";
     string videoname;
     cin >> videoname;
 
@@ -20,14 +20,12 @@ int main(int argc, char** argv)
     if(!encode.isEmpty())
         result = encode.data2Video();
 
+    cout << endl << "============================" << endl;
     if (result)
         cout << "成功！" << endl;
     else
         cout << "因为未知问题失败！" << endl;
-    //Encode encode;
-
-    //QRCode qr;
-    //Mat img = qr.getQRCode();    
-    //imshow("img", img);
-    //waitKey(0);
+    
+    cout << "视频文件（demo.mp4）将会存放在\"" << videoname << "\"目录下！" << endl;
+    return 0;
 }

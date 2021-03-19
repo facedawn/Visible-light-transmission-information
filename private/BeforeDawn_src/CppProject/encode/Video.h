@@ -2,8 +2,7 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 #include <vector>
-
-#include "Video.h"
+#include <cstdio>
 
 using namespace std;
 using namespace cv;
@@ -18,5 +17,10 @@ public:
 
 	void setFilename(string _filename);
 	bool isEmpty();
+	void append(Mat tmp);
+	void clear();
+
+	bool saveVideo();
+	void playVideo();
 };
 
