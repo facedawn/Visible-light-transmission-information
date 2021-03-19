@@ -12,12 +12,14 @@ using namespace std;
 //数据定义
 //=======================================
 #define WihtePadding 30        //白边像素
-#define NumberofColorBlocks 79 //矩阵大小（边长）（应满足两点：1、大小不能小于21,2、为奇数）
+#define NumberofColorBlocks 29 //矩阵大小（边长）（应满足两点：1、大小不能小于21,2、为奇数）
 #define Numbmerofpixels 5      //单个点对应的像素
 #define LinePixels (Numbmerofpixels * NumberofColorBlocks + 2 * WihtePadding)
 #define DataContain (NumberofColorBlocks * NumberofColorBlocks - 217 - 30 - (NumberofColorBlocks - 16) * 2) //可以储存的数据量，217为定位点占用，30为版本信息
 
-int matrix[NumberofColorBlocks][NumberofColorBlocks]; //二维码信息（这是一个没有冗余的数组！）
+char matrix[NumberofColorBlocks][NumberofColorBlocks]; //二维码信息（这是一个没有冗余的数组！）
+char xorMatrix[NumberofColorBlocks][NumberofColorBlocks]; //异或遮盖层
+vector<Vec3b> rgb_pixels;                             //创建 rgb像素点列表
 //大定位点
 const int bigAnchorPoint[8][8] = {
     1, 1, 1, 1, 1, 1, 1, 0,
@@ -58,13 +60,13 @@ void QRCode::getQRCode()
 
     //填写基础信息
     QRCodeBasic();
-    cout << "可以储存的二进制位数：" << DataContain << endl;
+    //cout << "可以储存的二进制位数：" << DataContain << endl;
 
     //写入数据
     //writeData();
 
     //异或运算
-    //Xor();
+    Xor2();
 
     //写入图片
     for (int i = 0; i < NumberofColorBlocks; i++)
@@ -156,7 +158,7 @@ void QRCode::writeData()
     }
 }
 
-void QRCode::Xor()
+void QRCode::Xor1()
 {
     int i, j;
     for (i = 9; i < NumberofColorBlocks - 9; i++)
@@ -219,6 +221,73 @@ void QRCode::Xor()
                 matrix[i][j] = 0;
             else
                 matrix[i][j] = 1;
+        }
+    }
+}
+
+void QRCode::Xor2()
+{
+    for (int i = 0; i < NumberofColorBlocks; i++)
+    {
+        for (int j = 0; j < NumberofColorBlocks; j++)
+        {
+            const int block = 5;
+            int x = i / block;
+            int y = j / block;
+            xorMatrix[i][j] = (char)((x + y + 1) % 2);
+        }
+    }
+
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            xorMatrix[i][j] = -1;
+            xorMatrix[NumberofColorBlocks - 1 - i][j] = -1;
+            xorMatrix[i][NumberofColorBlocks - 1 - j] = -1;
+        }
+    }
+    for (int i = 0; i < 5; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
+            xorMatrix[NumberofColorBlocks - 5 - i][NumberofColorBlocks - 5 - j] = -1;
+        }
+    }
+    for (int i = 8; i < NumberofColorBlocks - 8; i++)
+    {
+        xorMatrix[6][i] = -1;
+        xorMatrix[i][6] = -1;
+    }
+
+    for (int i = 0; i < 8; i++)
+    {
+        if (i > 1)
+            xorMatrix[7 - i][8] = -1;
+        else
+            xorMatrix[8 - i][8] = -1;
+        xorMatrix[8][NumberofColorBlocks - i - 1] = -1;
+    }
+    for (int i = 8; i < 14; i++)
+    {
+        xorMatrix[NumberofColorBlocks - 9][i - 8] = -1;
+        xorMatrix[8][i - 8] = -1;
+    }
+    xorMatrix[NumberofColorBlocks - 9][7] = -1;
+    xorMatrix[8][7] = -1;
+
+    for (int i = 0; i < NumberofColorBlocks; i++)
+    {
+        for (int j = 0; j < NumberofColorBlocks; j++)
+        {
+            if (xorMatrix[i][j] != -1)
+            {
+                int compare = (matrix[i][j] == -1) ? 0 : matrix[i][j];
+                if (compare != xorMatrix[i][j])
+                    matrix[i][j] = 1;
+                else
+                    matrix[i][j] = 0;
+            }
         }
     }
 }

@@ -31,8 +31,12 @@ bool DataBuffer::reload(string filename)
 
     in.seekg(0, ios::beg);
     in.read(data, len);
-
+    correcting();
     return true;
+}
+void DataBuffer::correcting()
+{
+    //在这里写纠错码的部分
 }
 
 int DataBuffer::size()

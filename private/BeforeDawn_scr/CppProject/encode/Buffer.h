@@ -16,6 +16,7 @@ public:
     DataBuffer(string filename);
 
     bool reload(string filename);
+    void correcting();
 
     int size();
     char nextChar();
