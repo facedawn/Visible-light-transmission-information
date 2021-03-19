@@ -3,7 +3,6 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-#include "Buffer.h"
 #include "Video.h"
 
 using namespace std;

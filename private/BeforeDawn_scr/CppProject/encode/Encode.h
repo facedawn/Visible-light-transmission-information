@@ -3,8 +3,9 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-#include "Buffer.h"
+#include "DataBuffer.h"
 #include "Video.h"
+#include "QRCode.h"
 
 using namespace std;
 using namespace cv;

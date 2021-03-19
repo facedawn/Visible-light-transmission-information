@@ -7,22 +7,22 @@ using namespace std;
 
 class DataBuffer
 {
-    int now;
-    int len;
+    unsigned int now;
+    unsigned int len;
     char* data;
-    string type;
+    string filetype;
 
+    void correcting();
+    void zip();
 public:
     DataBuffer();
     DataBuffer(string filename);
 
     bool reload(string filename);
-    void correcting();
-    void zip();
 
-    int size();
-    int pointer();
-    string filetype();
+    unsigned int size();
+    unsigned int pointer();
+    string getFiletype();
     char nextChar();
     bool isEnd();
     void resetPointer();

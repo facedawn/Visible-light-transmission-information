@@ -1,13 +1,8 @@
-#include "Buffer.h"
-
-#include <stdio.h>
-#include <iostream>
-
-using namespace std;
-
+#include "DataBuffer.h"
 
 DataBuffer::DataBuffer()
 {
+    now = 0;
     len = 0;
     data = NULL;
     resetPointer();
@@ -25,6 +20,7 @@ bool DataBuffer::reload(string filename)
     ifstream in(filename.data(), ios::in | ios::binary);
     if (!in)
     {
+        now = 0;
         len = 0;
         data = NULL;
         return false;
@@ -45,10 +41,8 @@ bool DataBuffer::reload(string filename)
     zip();
     correcting();
 
-    int index = filename.rfind(".");
-    printf("%d\t%d\n", index, filename.size());
-    type = filename.substr(index, filename.size() - index);
-    cout << filename << endl << type << endl;
+    int index = filename.rfind(".") + 1;
+    filetype = filename.substr(index, filename.size() - index);
 
     return true;
 }
@@ -63,17 +57,17 @@ void DataBuffer::zip()
     //这部分的优先级很低，可能并不会写
 }
 
-int DataBuffer::size()
+unsigned int DataBuffer::size()
 {
     return len;
 }
-int DataBuffer::pointer()
+unsigned int DataBuffer::pointer()
 {
     return now;
 }
-string DataBuffer::filetype()
+string DataBuffer::getFiletype()
 {
-    return type;
+    return filetype;
 }
 char DataBuffer::nextChar()
 {
@@ -84,7 +78,7 @@ char DataBuffer::nextChar()
 }
 bool DataBuffer::isEnd()
 {
-    return now == len;
+    return (now == len) || (len == 0);
 }
 void DataBuffer::resetPointer()
 {

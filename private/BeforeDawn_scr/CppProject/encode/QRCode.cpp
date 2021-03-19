@@ -1,11 +1,4 @@
 #include "QRCode.h"
-#include <opencv2/opencv.hpp>
-#include <random>
-#include <vector>
-#include "Buffer.h"
-
-using namespace cv;
-using namespace std;
 
 //=======================================
 //数据定义
@@ -46,18 +39,32 @@ const char version[15] = {
 
 QRCode::QRCode()
 {
-    //初始化
-    rgb_pixels.push_back({ 255, 255, 255 }); //0--白色
-    rgb_pixels.push_back({ 0, 0, 0 });       //1--黑色
+    init();
+    buffer = NULL;
 }
 
 QRCode::QRCode(DataBuffer* _buffer)
 {
+    init();
     setBuffer(_buffer);
 }
 void QRCode::setBuffer(DataBuffer* _buffer)
 {
     buffer = _buffer;
+}
+
+void QRCode::init()
+{
+    //初始化
+    rgb_pixels.push_back({ 255, 255, 255 }); //0--白色
+    rgb_pixels.push_back({ 0, 0, 0 });       //1--黑色
+}
+bool QRCode::isEnd()
+{
+    if (buffer != NULL)
+        return buffer->isEnd();
+    else
+        return true;
 }
 
 //生成二维码
@@ -156,10 +163,76 @@ void QRCode::QRCodeBasic()
 //写入数据
 void QRCode::writeData()
 {
-    int size = DataContain / 8;
-    int dataSize = buffer->size();
-    string type = buffer->filetype();
+    //二维码头将会占去8个字节，为了方便并未采用边长编码，后期若有时间可以优化
+    const int headCover = 8;
+    if (buffer == NULL)
+        return;
+    unsigned int size = DataContain / 8;
+    unsigned int dataSize = buffer->size();
+    unsigned int pointer = buffer->pointer();
+    string type = buffer->getFiletype();
+
+    unsigned int writeSize = (dataSize - pointer > size - headCover) ? size - headCover : (dataSize - pointer);
+    int x = NumberofColorBlocks - 1;
+    int y = NumberofColorBlocks - 1;
+    unsigned short page = pointer / (size - 8); //当前页数
+    unsigned short pageTotle = dataSize / (size - 8); //总共页数
+
+    unsigned short pow = 1;
+    for (int i = 0; i < 16; i++)
+    {
+        matrix[x][y] = ((page & pow) == pow) ? 1 : 0;
+        fixPoint(x, y);
+        pow *= 2;
+    }
+    pow = 1;
+    for (int i = 0; i < 16; i++)
+    {
+        matrix[x][y] = ((pageTotle & pow) == pow) ? 1 : 0;
+        fixPoint(x, y);
+        pow *= 2;
+    }
+
+    unsigned int pow2 = 1;
+    for (int i = 0; i < 32; i++)
+    {
+        matrix[x][y] = ((writeSize & pow2) == pow2) ? 1 : 0;
+        fixPoint(x, y);
+        pow2 *= 2;
+    }
+
+    while (writeSize-- && !buffer->isEnd())
+    {
+        char tmp = buffer->nextChar();
+        char pow3 = 1;
+        for (int i = 0; i < 8; i++)
+        {
+            matrix[x][y] = ((tmp & pow3) == pow3) ? 1 : 0;
+            fixPoint(x, y);
+            pow3 *= 2;
+        }
+    }
+    printf("Current pages:%d\tTotal pages:%d\n", page, pageTotle);
 }
+void QRCode::fixPoint(int& x, int& y)
+{
+    //x为行，y为列
+    //自动步进一步，找到可以落笔的空位。一旦溢出就会设为0,0
+    x--;
+    if (x < 0)
+    {
+        x = NumberofColorBlocks - 1;
+        y--;
+    }
+    if (y < 0)
+    {
+        x = 0, y = 0;
+        return;
+    }
+    if (matrix[x][y] != -1)
+        fixPoint(x, y);
+}
+
 
 void QRCode::Xor1()
 {

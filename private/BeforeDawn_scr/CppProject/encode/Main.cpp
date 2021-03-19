@@ -1,37 +1,29 @@
 ﻿#include <opencv2/opencv.hpp>
 #include <iostream>
-#include <random>
-#include <vector>
-#include "Buffer.h"
-#include "QRCode.h"
 #include "Encode.h"
-#include "Video.h"
 
 using namespace cv;
 using namespace std;
 
-void getBuffer(DataBuffer buffer)
+int main(int argc, char** argv)
 {
     cout << "请输入文件名：";
     string filename;
     cin >> filename;
-    if (!buffer.reload(filename))
-        cout << "读取失败！" << endl;
+    cout << "请输入视频文件名（无需带格式，自动生成avi格式）：";
+    string videoname;
+    cin >> videoname;
 
-    //while (!buffer.isEnd())
-    //{
-    //    char tmp = buffer.nextChar();
-    //    cout << tmp;
-    //}
-}
+    Encode encode(filename, videoname);
 
-int main(int argc, char** argv)
-{
-    DataBuffer buffer;
-    getBuffer(buffer);
-    cout << buffer.filetype();
+    bool result = false;
+    if(!encode.isEmpty())
+        result = encode.data2Video();
 
-
+    if (result)
+        cout << "成功！" << endl;
+    else
+        cout << "因为未知问题失败！" << endl;
     //Encode encode;
 
     //QRCode qr;
