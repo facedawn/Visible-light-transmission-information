@@ -1,6 +1,5 @@
 #include "QRCode.h"
 #include <opencv2/opencv.hpp>
-#include <iostream>
 #include <random>
 #include <vector>
 #include "Buffer.h"
@@ -12,7 +11,7 @@ using namespace std;
 //数据定义
 //=======================================
 #define WihtePadding 30        //白边像素
-#define NumberofColorBlocks 29 //矩阵大小（边长）（应满足两点：1、大小不能小于21,2、为奇数）
+#define NumberofColorBlocks 51 //矩阵大小（边长）（应满足两点：1、大小不能小于21,2、为奇数）
 #define Numbmerofpixels 5      //单个点对应的像素
 #define LinePixels (Numbmerofpixels * NumberofColorBlocks + 2 * WihtePadding)
 #define DataContain (NumberofColorBlocks * NumberofColorBlocks - 217 - 30 - (NumberofColorBlocks - 16) * 2) //可以储存的数据量，217为定位点占用，30为版本信息
@@ -52,8 +51,17 @@ QRCode::QRCode()
     rgb_pixels.push_back({ 0, 0, 0 });       //1--黑色
 }
 
+QRCode::QRCode(DataBuffer* _buffer)
+{
+    setBuffer(_buffer);
+}
+void QRCode::setBuffer(DataBuffer* _buffer)
+{
+    buffer = _buffer;
+}
+
 //生成二维码
-void QRCode::getQRCode()
+Mat QRCode::getQRCode()
 {
     //初始化图片并赋值为白色
     Mat img(LinePixels, LinePixels, CV_8UC3, Scalar(255, 255, 255));
@@ -63,7 +71,7 @@ void QRCode::getQRCode()
     //cout << "可以储存的二进制位数：" << DataContain << endl;
 
     //写入数据
-    //writeData();
+    writeData();
 
     //异或运算
     Xor2();
@@ -86,8 +94,8 @@ void QRCode::getQRCode()
             }
         }
     }
-    imshow("img", img);
-    waitKey(0);
+
+    return img;
 }
 
 //添加二维码的基础信息（定位点、矫正图、格式点）
@@ -148,14 +156,9 @@ void QRCode::QRCodeBasic()
 //写入数据
 void QRCode::writeData()
 {
-    for (int i = 0; i < NumberofColorBlocks; i++)
-    {
-        for (int j = 0; j < NumberofColorBlocks; j++)
-        {
-            if (matrix[i][j] == -1)
-                matrix[i][j] = rand() % 2;
-        }
-    }
+    int size = DataContain / 8;
+    int dataSize = buffer->size();
+    string type = buffer->filetype();
 }
 
 void QRCode::Xor1()
