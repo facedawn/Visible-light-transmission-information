@@ -6,20 +6,18 @@ using namespace std;
 using namespace cv;
 
 int main(int argc, char** argv) {
-    const char* imagename = "****";//此处为你自己的图片路径
+	cout << "请输入视频文件地址：";
+	string video;
+	cin >> video;
+	cout << "请输入输出文件地址：";
+	string output;
+	cin >> output;
 
-    //从文件中读入图像
-    Mat img = imread(imagename, 1);
+	Decode decode(output, video);
+	if (decode.video2Data())
+		cout << "打开成功！" << endl;
+	else
+		cout << "由于未知原因打开失败！" << endl;
 
-    //如果读入图像失败
-    if (img.empty()) {
-        fprintf(stderr, "Can not load image %s\n", imagename);
-        return -1;
-    }
-    //显示图像
-    imshow("image", img);
-
-    //此函数等待按键，按键盘任意键就返回
-    waitKey();
-    return 0;
+	return 0;
 }
