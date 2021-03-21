@@ -10,7 +10,7 @@ class Video
 {
 	string filename;
 	vector<Mat> img;
-	int now;
+	unsigned int now;
 	void init();
 public:
 	Video();
@@ -20,5 +20,6 @@ public:
 	Mat nextImg();
 	void resetPointer();
 	int size();
+	unsigned int pointer();
 };
 
