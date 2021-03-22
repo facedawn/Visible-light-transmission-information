@@ -27,3 +27,10 @@ bool QRList::edit(int index, AnchorPoint tmp)
 	QR[index] = tmp;
 	return true;
 }
+
+AnchorPoint& QRList::operator[](int i)
+{
+	if (i >= size()) //不够长就补长
+		QR.resize(i + 1);
+	return QR[i];
+}

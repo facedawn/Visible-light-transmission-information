@@ -17,6 +17,15 @@ AnchorPoint::AnchorPoint(BlockCoordinates block1, BlockCoordinates block2, Block
 	block[3] = block4;
 	QR = blockQR;
 }
+AnchorPoint::AnchorPoint(BlockCoordinates block1, BlockCoordinates block2, BlockCoordinates block3, BlockCoordinates block4, BlockCoordinates blockQR, Mat tmp)
+{
+	block[0] = block1;
+	block[1] = block2;
+	block[2] = block3;
+	block[3] = block4;
+	QR = blockQR;
+	img = tmp;
+}
 
 void AnchorPoint::setLeftTop(BlockCoordinates other)
 {
@@ -83,6 +92,10 @@ void AnchorPoint::setQRPlace(int x1, int y1, int x2, int y2)
 	QR = BlockCoordinates(x1, y1, x2, y2);
 }
 
+void AnchorPoint::setImg(Mat tmp)
+{
+	img = tmp;
+}
 
 BlockCoordinates AnchorPoint::leftTop()
 {
@@ -103,4 +116,8 @@ BlockCoordinates AnchorPoint::rightBottom()
 BlockCoordinates AnchorPoint::QRPlace()
 {
 	return QR;
+}
+Mat AnchorPoint::getImg()
+{
+	return img;
 }

@@ -14,5 +14,7 @@ public:
 	AnchorPoint indexof(int index);
 	void append(AnchorPoint tmp);
 	bool edit(int index, AnchorPoint tmp);
+
+	AnchorPoint& operator[](int i);
 };
 

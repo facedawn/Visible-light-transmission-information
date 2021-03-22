@@ -22,5 +22,8 @@ bool QRCode::decode(Mat img)
 {
 	if (buffer == NULL)
 		return false;
+
+	QRList QR = locationQR(img);
+
 	return true;
 }
