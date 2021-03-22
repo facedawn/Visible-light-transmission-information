@@ -24,9 +24,12 @@ bool Decode::video2Data()
 	while (!video.isEnd())
 	{
 		//Mat img = video.nextImg();
-		imshow("result", video.nextImg());
+		//imshow("result", video.nextImg());
 		printf("%d %d\n", video.pointer(), video.size());
-		waitKey(100);
+		//waitKey(100);
+
+		QRCode QR(&buffer);
+		QR.decode(video.nextImg());
 	}
 	return true;
 }
