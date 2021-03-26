@@ -14,8 +14,7 @@ class QRCode
 	void init();
 	void QRCodeBasic();
 	void writeData();
-	void Xor1();
-	void Xor2();
+	void Xor();
 	void fixPoint(int& x, int& y);
 public:
 	QRCode();

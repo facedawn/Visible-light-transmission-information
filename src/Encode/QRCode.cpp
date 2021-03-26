@@ -3,11 +3,13 @@
 //=======================================
 //数据定义
 //=======================================
-#define WihtePadding 30        //白边像素
-#define NumberofColorBlocks 51 //矩阵大小（边长）（应满足两点：1、大小不能小于21,2、为奇数）
+#define WihtePadding 10        //白边像素
+#define MarginPedding 30        //外边距白边像素
+#define BlackSquare 3           //黑框像素
+#define NumberofColorBlocks 101 //矩阵大小（边长）（应满足两点：1、大小不能小于35,2、为奇数）
 #define Numbmerofpixels 5      //单个点对应的像素
-#define LinePixels (Numbmerofpixels * NumberofColorBlocks + 2 * WihtePadding)
-#define DataContain (NumberofColorBlocks * NumberofColorBlocks - 217 - 30 - (NumberofColorBlocks - 16) * 2) //可以储存的数据量，217为定位点占用，30为版本信息
+#define LinePixels (Numbmerofpixels * NumberofColorBlocks + 2 * WihtePadding + 2 * MarginPedding + 2 * BlackSquare)
+#define DataContain (NumberofColorBlocks * NumberofColorBlocks - 192 - 30 - (NumberofColorBlocks - 16) * 2) //可以储存的数据量，217为定位点占用，30为版本信息
 
 char matrix[NumberofColorBlocks][NumberofColorBlocks]; //二维码信息（这是一个没有冗余的数组！）
 char xorMatrix[NumberofColorBlocks][NumberofColorBlocks]; //异或遮盖层
@@ -81,7 +83,7 @@ Mat QRCode::getQRCode()
     writeData();
 
     //异或运算
-    Xor2();
+    Xor();
 
     //写入图片
     for (int i = 0; i < NumberofColorBlocks; i++)
@@ -93,12 +95,22 @@ Mat QRCode::getQRCode()
             {
                 for (int q = 0; q < Numbmerofpixels; q++)
                 {
-                    int x = i * Numbmerofpixels + p + WihtePadding;
-                    int y = j * Numbmerofpixels + q + WihtePadding;
+                    int x = i * Numbmerofpixels + p + WihtePadding + MarginPedding + BlackSquare;
+                    int y = j * Numbmerofpixels + q + WihtePadding + MarginPedding + BlackSquare;
                     int color = (matrix[i][j] == -1) ? 0 : matrix[i][j];
                     img.at<Vec3b>(x, y) = rgb_pixels[color];
                 }
             }
+        }
+    }
+    for (int i = MarginPedding; i < MarginPedding + BlackSquare; i++)
+    {
+        for (int j = MarginPedding; j < LinePixels - MarginPedding; j++)
+        {
+            img.at<Vec3b>(i, j) = 1;
+            img.at<Vec3b>(j, i) = 1;
+            img.at<Vec3b>(LinePixels - i, j) = 1;
+            img.at<Vec3b>(LinePixels - j, LinePixels - i) = 1;
         }
     }
 
@@ -128,55 +140,40 @@ void QRCode::QRCodeBasic()
             matrix[i][NumberofColorBlocks - 1 - j] = bigAnchorPoint[i][j];
         }
     }
-    //填补小定位点
-    for (i = 0; i < 5; i++)
-    {
-        for (j = 0; j < 5; j++)
-        {
-            matrix[NumberofColorBlocks - 5 - i][NumberofColorBlocks - 5 - j] = smallAnchorPoint[i][j];
-        }
-    }
+
+
     //填补定位点
     for (i = 8; i < NumberofColorBlocks - 8; i++)
     {
-        matrix[6][i] = (i + 1) % 2;
-        matrix[i][6] = (i + 1) % 2;
+        matrix[0][i] = (i + 1) % 2;
+        matrix[i][0] = (i + 1) % 2;
     }
+
     //填写版本信息
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < 16; i++)
     {
-        if (i > 1)
-            matrix[7 - i][8] = version[i];
-        else
-            matrix[8 - i][8] = version[i];
-        matrix[8][NumberofColorBlocks - i - 1] = version[i];
+        matrix[1][i + 9] = version[i];
+        matrix[i + 9][1] = version[i];
     }
-    for (i = 8; i < 14; i++)
-    {
-        matrix[NumberofColorBlocks - 9][i - 8] = version[i];
-        matrix[8][i - 8] = version[i];
-    }
-    matrix[NumberofColorBlocks - 9][7] = version[14];
-    matrix[8][7] = version[14];
 }
 
 //写入数据
 void QRCode::writeData()
 {
-    //二维码头将会占去8个字节，为了方便并未采用边长编码，后期若有时间可以优化
+    //二维码头将会占去8个字节，为了方便并未采用变长编码，后期若有时间可以优化
     const int headCover = 8;
     if (buffer == NULL)
         return;
-    unsigned int size = DataContain / 8;
+    unsigned int size = DataContain / 8; //当前大小二维码可写字节数
     unsigned int dataSize = buffer->size();
     unsigned int pointer = buffer->pointer();
     string type = buffer->getFiletype();
 
     unsigned int writeSize = (dataSize - pointer > size - headCover) ? size - headCover : (dataSize - pointer);
-    int x = NumberofColorBlocks - 1;
+    int x = NumberofColorBlocks - 1; //重置写入位置指针
     int y = NumberofColorBlocks - 1;
-    unsigned short page = pointer / (size - 8); //当前页数
-    unsigned short pageTotle = dataSize / (size - 8); //总共页数
+    unsigned short page = pointer / (size - headCover); //当前页数
+    unsigned short pageTotle = dataSize / (size - headCover); //总共页数
 
     unsigned short pow = 1;
     for (int i = 0; i < 16; i++)
@@ -234,80 +231,13 @@ void QRCode::fixPoint(int& x, int& y)
 }
 
 
-void QRCode::Xor1()
-{
-    int i, j;
-    for (i = 9; i < NumberofColorBlocks - 9; i++)
-    {
-        for (j = 0; j < 6; j++)
-        {
-            int cover = (i + j + 1) % 2;
-            //左
-            int compare = (matrix[i][j] == -1) ? 0 : matrix[i][j];
-            if (compare == cover)
-                matrix[i][j] = 0;
-            else
-                matrix[i][j] = 1;
-            //上
-            compare = (matrix[j][i] == -1) ? 0 : matrix[j][i];
-            if (compare == cover)
-                matrix[j][i] = 0;
-            else
-                matrix[j][i] = 1;
-        }
-    }
-    for (i = 9; i < NumberofColorBlocks - 9; i++)
-    {
-        for (j = 7; j < 9; j++)
-        {
-            int cover = (i + j + 1) % 2;
-            //左
-            int compare = (matrix[i][j] == -1) ? 0 : matrix[i][j];
-            if (compare == cover)
-                matrix[i][j] = 0;
-            else
-                matrix[i][j] = 1;
-            //上
-            compare = (matrix[j][i] == -1) ? 0 : matrix[j][i];
-            if (compare == cover)
-                matrix[j][i] = 0;
-            else
-                matrix[j][i] = 1;
-        }
-    }
-    for (i = NumberofColorBlocks - 1; i > NumberofColorBlocks - 10; i--)
-    {
-        int cover = (i + 8 + 1) % 2;
-        int compare = (matrix[i][8] == -1) ? 0 : matrix[i][8];
-        if (compare == cover)
-            matrix[i][8] = 0;
-        else
-            matrix[i][8] = 1;
-    }
-    for (i = 8; i < NumberofColorBlocks; i++)
-    {
-        for (j = 8; j < NumberofColorBlocks; j++)
-        {
-            if (i > NumberofColorBlocks - 10 && i < NumberofColorBlocks - 4) //去除小定位点
-                if (j > NumberofColorBlocks - 10 && j < NumberofColorBlocks - 4)
-                    continue;
-            int cover = (i + j + 1) % 2;
-            int compare = (matrix[i][j] == -1) ? 0 : matrix[i][j];
-            if (compare == cover)
-                matrix[i][j] = 0;
-            else
-                matrix[i][j] = 1;
-        }
-    }
-}
-
-void QRCode::Xor2()
+void QRCode::Xor()
 {
     for (int i = 0; i < NumberofColorBlocks; i++)
     {
         for (int j = 0; j < NumberofColorBlocks; j++)
         {
-            const int block = 5;
+            const int block = 5; //区块大小
             int x = i / block;
             int y = j / block;
             xorMatrix[i][j] = (char)((x + y + 1) % 2);
@@ -323,34 +253,20 @@ void QRCode::Xor2()
             xorMatrix[i][NumberofColorBlocks - 1 - j] = -1;
         }
     }
-    for (int i = 0; i < 5; i++)
-    {
-        for (int j = 0; j < 5; j++)
-        {
-            xorMatrix[NumberofColorBlocks - 5 - i][NumberofColorBlocks - 5 - j] = -1;
-        }
-    }
+
     for (int i = 8; i < NumberofColorBlocks - 8; i++)
     {
-        xorMatrix[6][i] = -1;
-        xorMatrix[i][6] = -1;
+        xorMatrix[0][i] = -1;
+        xorMatrix[i][0] = -1;
     }
 
-    for (int i = 0; i < 8; i++)
+    //填写版本信息
+    for (int i = 0; i < 16; i++)
     {
-        if (i > 1)
-            xorMatrix[7 - i][8] = -1;
-        else
-            xorMatrix[8 - i][8] = -1;
-        xorMatrix[8][NumberofColorBlocks - i - 1] = -1;
+        xorMatrix[1][i + 9] = -1;
+        xorMatrix[i + 9][1] = -1;
     }
-    for (int i = 8; i < 14; i++)
-    {
-        xorMatrix[NumberofColorBlocks - 9][i - 8] = -1;
-        xorMatrix[8][i - 8] = -1;
-    }
-    xorMatrix[NumberofColorBlocks - 9][7] = -1;
-    xorMatrix[8][7] = -1;
+
 
     for (int i = 0; i < NumberofColorBlocks; i++)
     {

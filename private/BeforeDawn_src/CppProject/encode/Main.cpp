@@ -1,8 +1,7 @@
-﻿#include <opencv2/opencv.hpp>
+﻿#include <string>
 #include <iostream>
 #include "Encode.h"
 
-using namespace cv;
 using namespace std;
 
 int main(int argc, char** argv)
