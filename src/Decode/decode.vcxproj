@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="DataBuffer.cpp" />
     <ClCompile Include="Decode.cpp" />
+    <ClCompile Include="Location.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QRCode.cpp" />
     <ClCompile Include="QRList.cpp" />
@@ -153,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="DataBuffer.h" />
     <ClInclude Include="Decode.h" />
+    <ClInclude Include="Location.h" />
     <ClInclude Include="QRCode.h" />
     <ClInclude Include="QRList.h" />
     <ClInclude Include="QRMatrix.h" />
