@@ -1,20 +1,20 @@
 #pragma once
 #include <vector>
-#include "AnchorPoint.h"
+#include "QRMatrix.h"
 
 using namespace std;
 
 class QRList
 {
-	vector<AnchorPoint> QR;
+	vector<QRMatrix> QR;
 public:
 	QRList();
 
 	int size();
-	AnchorPoint indexof(int index);
-	void append(AnchorPoint tmp);
-	bool edit(int index, AnchorPoint tmp);
+	QRMatrix& at(int index);
+	void append(QRMatrix tmp);
+	bool edit(int index, QRMatrix tmp);
 
-	AnchorPoint& operator[](int i);
+	QRMatrix& operator[](int i);
 };
 

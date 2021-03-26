@@ -9,18 +9,16 @@ int QRList::size()
 {
 	return QR.size();
 }
-AnchorPoint QRList::indexof(int index)
+QRMatrix& QRList::at(int index)
 {
-	if (index >= size())
-		return AnchorPoint();
 	return QR[index];
 }
 
-void QRList::append(AnchorPoint tmp)
+void QRList::append(QRMatrix tmp)
 {
 	QR.push_back(tmp);
 }
-bool QRList::edit(int index, AnchorPoint tmp)
+bool QRList::edit(int index, QRMatrix tmp)
 {
 	if (index >= size())
 		return false;
@@ -28,7 +26,7 @@ bool QRList::edit(int index, AnchorPoint tmp)
 	return true;
 }
 
-AnchorPoint& QRList::operator[](int i)
+QRMatrix& QRList::operator[](int i)
 {
 	if (i >= size()) //不够长就补长
 		QR.resize(i + 1);
