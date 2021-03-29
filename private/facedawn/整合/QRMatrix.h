@@ -7,9 +7,9 @@ class QRMatrix
 	int h;
 public:
 	QRMatrix();
-	~QRMatrix();
 	QRMatrix(int width, int height);
-	QRMatrix(char*ans,int width, int height);
+	QRMatrix(char* data, int width, int height);
+
 	void resize(int width, int height);
 	int height();
 	int width();

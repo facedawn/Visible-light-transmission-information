@@ -9,17 +9,13 @@ QRMatrix::QRMatrix(int width, int height)
 	matrix = nullptr;
 	resize(width, height);
 }
-
-QRMatrix::QRMatrix(char* ans, int width, int height)
-{	
-	resize(width, height);
-	matrix = ans;
-}
-QRMatrix::~QRMatrix()
+QRMatrix::QRMatrix(char* data, int width, int height)
 {
-	if (matrix != nullptr)
-		delete[] matrix;
+	matrix = nullptr;
+	resize(width, height);
+	matrix = data;
 }
+
 void QRMatrix::resize(int width, int height)
 {
 	if (matrix != nullptr)

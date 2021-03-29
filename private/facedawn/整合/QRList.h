@@ -1,9 +1,6 @@
 #pragma once
 #include <vector>
 #include "QRMatrix.h"
-#include <string>
-#include <iostream>
-#include <sstream>
 
 using namespace std;
 

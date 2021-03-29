@@ -1,30 +1,5 @@
 #include "Location.h"
-
-
-
-Mat src, src_gray;
-Mat dst, detected_edges;
-
-int edgeThresh = 1;
-int lowThreshold = 50;
-int const max_lowThreshold = 100;
-int ratioo = 3;
-int kernel_size = 3;
-char* window_name = (char*)"Edge Map";
-Mat fsrc;
-int ccc = 1;//1Îª²»Áô±ßÔµ £¬0Îª±£Áô´ó¿é±ßÔµ
-
-bool po_cmp(po a, po b)
-{
-	if (a.maxx - a.minx != b.maxx - b.minx)
-	{
-		return a.maxx - a.minx > b.maxx - b.minx;
-	}
-	else
-		return a.maxy - a.miny > b.maxy - b.miny;
-}//¶ÔºòÑ¡¶¨Î»µã½øĞĞÅÅĞò
-
-double cross(Point before, Point next, Point mid)//before->mid    mid->next  ÏòÁ¿²æ³Ë£¨Æ½ĞĞËÄ±ßĞÎÃæ»ı£©
+double Location::cross(Point before, Point next, Point mid)//before->mid    mid->next  ÏòÁ¿²æ³Ë£¨Æ½ĞĞËÄ±ßĞÎÃæ»ı£©
 {
 	double x1, y1, x2, y2;
 	x1 = mid.x - before.x;
@@ -34,12 +9,11 @@ double cross(Point before, Point next, Point mid)//before->mid    mid->next  ÏòÁ
 	return (x1 * y2) - (x2 * y1);
 }
 
-double dis(Point a, Point b)
+double Location::dis(Point a, Point b)
 {
 	return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
-Point base;//»ù×¼µã£¬±ØÎªÍ¹°üÉÏÒ»µã£¬ÇÒÆäÓàËùÓĞµã¶¼ÔÚ¸ÃµãÓÒ±ß
 bool cmp(Point a, Point b)//¸ù¾İ¸ÃµãÓë»ù×¼µãµÄÁ¬ÏßºÍË®Æ½ÏßËù³ÉµÄ¼Ğ½ÇÅÅĞò
 {
 	double tana, tanb;
@@ -91,9 +65,13 @@ vector<Point> find_tubao(vector<Point>& a)
 	return result;
 }
 
+void show(Mat img)
+{
+	imshow("show", img);
+	waitKey();
+}
 
-
-void Location::SobelEnhance(const Mat src, Mat& dst)
+void SobelEnhance(const Mat src, Mat& dst)
 {
 	Mat sobelx(src.size(), CV_16SC1);///±ßÔµ¼ì²âºó£¬»áÓĞ¸ºÖµ£¬Ò²»áÓĞ´óÓÚ255µÄÖµ£¬Òò´ËÀàĞÍÉèÎªCV_16SC1ÓĞ·ûºÅÀàĞÍ
 	Mat sobely(src.size(), CV_16SC1);
@@ -107,7 +85,7 @@ void Location::SobelEnhance(const Mat src, Mat& dst)
 	addWeighted(img_edgeFiltex, 1, img_edgeFiltey, 1, 0, dst);
 }
 
-void Location::CannyThreshold(int, void*)
+void CannyThreshold(int, void*)
 {
 	/// Ê¹ÓÃ 3x3ÄÚºË½µÔë
 	//blur(src_gray, detected_edges, Size(3, 3));//ÊäÈë»Ò¶ÈÍ¼src_gray£¬Êä³öÂË²¨ºóµÄÍ¼Æ¬µ½detected_edges
@@ -137,10 +115,10 @@ void Location::CannyThreshold(int, void*)
 
 	src.copyTo(dst, detected_edges);
 	//imshow(window_name, dst);
-	//imwrite("edge.jpg", dst);
+	imwrite("edge.jpg", dst);
 }
 
-void Location::canny(Mat a)
+void canny(Mat a)
 {
 	src = a;
 	src.copyTo(fsrc);
@@ -165,18 +143,17 @@ void Location::canny(Mat a)
 	waitKey(0);
 }
 
+bool po_cmp(po a, po b)
+{
+	if (a.maxx - a.minx != b.maxx - b.minx)
+	{
+		return a.maxx - a.minx > b.maxx - b.minx;
+	}
+	else
+		return a.maxy - a.miny > b.maxy - b.miny;
+}//¶ÔºòÑ¡¶¨Î»µã½øĞĞÅÅĞò
 
-//bool Location::po_cmp(po a, po b)
-//{
-//	if (a.maxx - a.minx != b.maxx - b.minx)
-//	{
-//		return a.maxx - a.minx > b.maxx - b.minx;
-//	}
-//	else
-//		return a.maxy - a.miny > b.maxy - b.miny;
-//}//¶ÔºòÑ¡¶¨Î»µã½øĞĞÅÅĞò
-
-string Location::int2str(const int& int_temp)
+string int2str(const int& int_temp)
 {
 	string string_temp;
 	stringstream stream;
@@ -185,7 +162,7 @@ string Location::int2str(const int& int_temp)
 	return string_temp;
 }
 
-int Location::find_point(vector<po>& s)//´ÓºòÑ¡µãÖĞÕÒµ½Èı¸ö,·µ»ØµÚÒ»¸öµÄĞòºÅ
+int find_point(vector<po>& s)//´ÓºòÑ¡µãÖĞÕÒµ½Èı¸ö,·µ»ØµÚÒ»¸öµÄĞòºÅ
 {
 	int all = s.size();
 	int col = fsrc.cols, row = src.rows;
@@ -215,9 +192,9 @@ int Location::find_point(vector<po>& s)//´ÓºòÑ¡µãÖĞÕÒµ½Èı¸ö,·µ»ØµÚÒ»¸öµÄĞòºÅ
 		cosb = ((mid1x - mid2x) * (mid3x - mid2x) + (mid1y - mid2y) * (mid3y - mid2y)) / ab / bc;
 		cosc = ((mid2x - mid3x) * (mid1x - mid3x) + (mid2y - mid3y) * (mid1y - mid3y)) / bc / ac;
 
-		//printf("a:%d %d\nb:%d %d\nc:%d %d\n", mid1x, mid1y, mid2x, mid2y, mid3x, mid3y);
+		printf("a:%d %d\nb:%d %d\nc:%d %d\n", mid1x, mid1y, mid2x, mid2y, mid3x, mid3y);
 
-		//printf("cosa=%lf	cosb=%lf	cosc= %lf\n", cosa, cosb, cosc);
+		printf("cosa=%lf	cosb=%lf	cosc= %lf\n", cosa, cosb, cosc);
 		if (abs(p3x - p1x) <= col / 150 && abs(p3y - p1y) <= row / 150 && abs(p3x - p2x) <= col / 150 && abs(p3y - p2y) <= row / 150)
 		{
 			//printf("a:%d %d\nb:%d %d\nc:%d %d\n", mid1x, mid1y, mid2x, mid2y, mid3x, mid3y);
@@ -234,14 +211,10 @@ int Location::find_point(vector<po>& s)//´ÓºòÑ¡µãÖĞÕÒµ½Èı¸ö,·µ»ØµÚÒ»¸öµÄĞòºÅ
 		}
 		else continue;
 	}
-
-
 	return -1;
-
 }
 
-
-void Location::find4j()
+void find4j()
 {
 	Point2f mid = Point2f(0, 0);
 	for (int i = 0; i < 4; i++)
@@ -277,8 +250,7 @@ void Location::find4j()
 	}
 }
 
-
-bool Location::location2(Mat a)
+bool location2(Mat a)
 {
 	canny(a);
 
@@ -351,8 +323,7 @@ bool Location::location2(Mat a)
 		//q.d = contours[vector_contours_filter[j]];
 		s.push_back(q);
 	}
-	//sort(s.begin(), s.end(),po_cmp);//ÅÅĞò£¬ÕÒÏà½üµÄ
-	sort(s.begin(), s.end(), po_cmp);
+	sort(s.begin(), s.end(), po_cmp);//ÅÅĞò£¬ÕÒÏà½üµÄ
 	int ans = -1;
 	ans = find_point(s);//·µ»ØÈı¸öºòÑ¡µãµÄµÚÒ»¸öµÄĞòºÅ
 	if (ans == -1)
@@ -367,6 +338,8 @@ bool Location::location2(Mat a)
 	//res_contours = find_tubao(res_contours);
 
 	approxPolyDP(res_contours, res_contours, 50, true);
+	cout << res_contours << endl;
+	cout << res_contours.size() << endl;
 
 	vector<Point2f>point_minRect12;
 	for (int i = 0; i < 4; i++)
@@ -402,7 +375,6 @@ bool Location::location2(Mat a)
 		vertexs_minRect_QR[i] = point_minRect12[(i + 4 - f)%4];
 	}*/
 	find4j();
-	//cout << vertexs_minRect_QR[0] << "  " << vertexs_minRect_QR[1] << "  " << vertexs_minRect_QR[2] << "  " << vertexs_minRect_QR[3] << "  " << endl;
 
 	f = 6;
 	for (int i = ans; i < ans + 3; i++)
@@ -424,7 +396,6 @@ bool Location::location2(Mat a)
 			f -= 1;
 		}
 	}
-	//printf("f=%d\n", f); cout << vertexs_minRect_QR[0] << "    " << midPoint_rect << endl;
 	Point2f temp1 = vertexs_minRect_QR[(2 + 0 + f) % 4];
 	Point2f temp2 = vertexs_minRect_QR[(3 + 0 + f) % 4];
 	Point2f temp3 = vertexs_minRect_QR[(0 + 0 + f) % 4];
@@ -435,22 +406,19 @@ bool Location::location2(Mat a)
 	vertexs_minRect_QR[2] = temp2;
 	vertexs_minRect_QR[3] = temp3;
 
-	//cout << vertexs_minRect_QR[0] << "    " << midPoint_rect << endl;
-
-	//cout << vertexs_minRect_QR[0] << "  " << vertexs_minRect_QR[1] << "  " << vertexs_minRect_QR[2] << "  " << vertexs_minRect_QR[3] << "  " << endl;
-	//int col = src.cols, row = src.rows;
-	//while (col > 1000 || row > 1000)
-	//{
-	//	col *= 0.99;
-	//	row *= 0.99;
-	//}
-	//resize(src, src, Size(col, row));
+	int col = src.cols, row = src.rows;
+	while (col > 1000 || row > 1000)
+	{
+		col *= 0.99;
+		row *= 0.99;
+	}
+	resize(src, src, Size(col, row));
 
 	//show(src);
 
 }
 
-void Location::end_correct(Mat f)
+void end_correct(Mat f)
 {
 	int lenth = 826;
 	Point2f vertex_warp[4];
@@ -464,7 +432,8 @@ void Location::end_correct(Mat f)
 	warpPerspective(f, dst, transform, Size(lenth, lenth));//dstÖĞÎª³õ´ÎÇĞ¸îÏÂÀ´µÄ¶şÎ¬Âë
 }
 
-void Location::read(Mat a)
+
+void read(Mat a)
 {
 	cvtColor(a, a, COLOR_RGB2GRAY);
 	//show(a);
@@ -489,28 +458,31 @@ void Location::read(Mat a)
 			if ((double)cnt / (pointOfeachBlock * pointOfeachBlock) > 0.5)//ºÚ¿é¶à
 			{
 				//printf("%d ", cnt);
-				ans[i*(numberofblock)+j] = 1;
+				ans[i][j] = 1;
 			}
 			else
 			{
-				ans[i* numberofblock+j] = 0;
+				ans[i][j] = 0;
 			}
 			//fprintf(fp, "%d ", ans[i][j]);
-
 		}
 	}
 }
 
-Location::Location(Mat src)//ÊäÈëÍ¼Æ¬
+Location::Location(Mat a)
 {
-	ans=new char[(numberofblock) * (numberofblock)];
+	source = a;
 	if (src.empty()) {
 		//¼ì²éÊÇ·ñ¶ÁÈ¡Í¼Ïñ
 		cout << "Error! Input image cannot be read...\n";
+		return -1;
 	}
 	if (location2(src))
 	{
 		end_correct(fsrc);
 	}
 	read(dst);
+	res.matrix = ans;
+	res.w = numberofblock;
+	res.h = numberofblock;
 }

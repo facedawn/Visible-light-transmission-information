@@ -1,10 +1,8 @@
 #include "QRList.h"
-#include "Location.h"
 
 QRList::QRList()
 {
 	QR.clear();
-	
 }
 
 int QRList::size()
