@@ -25,7 +25,7 @@ bool Decode::video2Data()
 	{
 		//Mat img = video.nextImg();
 		//imshow("result", video.nextImg());
-		printf("%d %d\n", video.pointer(), video.size());
+		printf("now:%d\ttotal:%d\n", video.pointer(), video.size());
 		//waitKey(100);
 
 		QRCode QR(&buffer);

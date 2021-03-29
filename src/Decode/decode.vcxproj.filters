@@ -36,7 +36,10 @@
     <ClCompile Include="QRMatrix.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Location.cpp">
+    <ClCompile Include="QRLocation.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalMacroDefine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +62,10 @@
     <ClInclude Include="QRMatrix.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Location.h">
+    <ClInclude Include="QRLocation.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalMacroDefine.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

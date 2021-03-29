@@ -8,6 +8,7 @@ class QRMatrix
 public:
 	QRMatrix();
 	QRMatrix(int width, int height);
+	QRMatrix(char* data, int width, int height);
 
 	void resize(int width, int height);
 	int height();

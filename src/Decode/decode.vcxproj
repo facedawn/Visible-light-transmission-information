@@ -144,19 +144,21 @@
   <ItemGroup>
     <ClCompile Include="DataBuffer.cpp" />
     <ClCompile Include="Decode.cpp" />
-    <ClCompile Include="Location.cpp" />
+    <ClCompile Include="GlobalMacroDefine.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QRCode.cpp" />
     <ClCompile Include="QRList.cpp" />
+    <ClCompile Include="QRLocation.cpp" />
     <ClCompile Include="QRMatrix.cpp" />
     <ClCompile Include="Video.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataBuffer.h" />
     <ClInclude Include="Decode.h" />
-    <ClInclude Include="Location.h" />
+    <ClInclude Include="GlobalMacroDefine.h" />
     <ClInclude Include="QRCode.h" />
     <ClInclude Include="QRList.h" />
+    <ClInclude Include="QRLocation.h" />
     <ClInclude Include="QRMatrix.h" />
     <ClInclude Include="Video.h" />
   </ItemGroup>
