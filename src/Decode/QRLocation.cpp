@@ -2,14 +2,14 @@
 
 Mat src, src_gray;
 Mat dst, detected_edges;
+Mat fsrc;
 
 int edgeThresh = 1;
 int lowThreshold = 50;
 int const max_lowThreshold = 100;
 int ratioo = 3;
 int kernel_size = 3;
-char* window_name = (char*)"Edge Map";
-Mat fsrc;
+
 int ccc = 1;//1为不留边缘 ，0为保留大块边缘
 
 bool po_cmp(po a, po b)
@@ -105,49 +105,26 @@ void QRLocation::SobelEnhance(const Mat src, Mat& dst)
 
 void QRLocation::CannyThreshold(int, void*)
 {
-	/// 使用 3x3内核降噪
-	//blur(src_gray, detected_edges, Size(3, 3));//输入灰度图src_gray，输出滤波后的图片到detected_edges
 	equalizeHist(detected_edges, detected_edges);//直方图均衡化，增加像素灰度值的动态范围，达到增强图像整体对比度的效果
 
 
 	GaussianBlur(src_gray, detected_edges, Size(7, 7), 0, 0);
 	threshold(src_gray, detected_edges, 150, 255, THRESH_BINARY);
-
-
-	//SobelEnhance(detected_edges, detected_edges);// 增强图象
-
-	//detected_edges = src_gray;
-	//imwrite("pic.jpg", detected_edges);
-	//show(detected_edges);
-	//threshold(detected_edges, detected_edges, 150, 255, 0);
-	/// 运行Canny算子, 边缘记录在原图像
 	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * ratioo, kernel_size);
 
-	//膨胀两次，让边缘闭合
 	cv::dilate(detected_edges, detected_edges, cv::Mat());//膨胀
 	cv::dilate(detected_edges, detected_edges, cv::Mat());//膨胀
-	//cv::erode(detected_edges, detected_edges, cv::Mat());//腐蚀
 
-	/// 使用 Canny算子输出边缘作为掩码显示原图像
 	dst = Scalar::all(0);
 
 	src.copyTo(dst, detected_edges);
-	//imshow(window_name, dst);
-	//imwrite("edge.jpg", dst);
+
 }
 
 void QRLocation::canny(Mat a)
 {
 	src = a;
 	src.copyTo(fsrc);
-	//GaussianBlur(src, src, Size(9, 9), 0, 0);
-	/*int col = src.cols, row = src.rows;
-	while (col > 900 || row > 900)
-	{
-		col *= 0.99;
-		row *= 0.99;
-	}
-	resize(src, src, Size(col, row));*/
 
 
 	dst.create(src.size(), src.type());//创建和img相同大小的图
@@ -155,22 +132,9 @@ void QRLocation::canny(Mat a)
 		cvtColor(src, src_gray, COLOR_BGR2GRAY);//转灰度图
 	else
 		src.copyTo(src_gray);
-	//namedWindow(window_name, WINDOW_AUTOSIZE);
-	//createTrackbar("Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold);
 	CannyThreshold(0, 0);
 	waitKey(0);
 }
-
-
-//bool QRLocation::po_cmp(po a, po b)
-//{
-//	if (a.maxx - a.minx != b.maxx - b.minx)
-//	{
-//		return a.maxx - a.minx > b.maxx - b.minx;
-//	}
-//	else
-//		return a.maxy - a.miny > b.maxy - b.miny;
-//}//对候选定位点进行排序
 
 string QRLocation::int2str(const int& int_temp)
 {
@@ -211,20 +175,13 @@ int QRLocation::find_point(vector<po>& s)//从候选点中找到三个,返回第一个的序号
 		cosb = ((mid1x - mid2x) * (mid3x - mid2x) + (mid1y - mid2y) * (mid3y - mid2y)) / ab / bc;
 		cosc = ((mid2x - mid3x) * (mid1x - mid3x) + (mid2y - mid3y) * (mid1y - mid3y)) / bc / ac;
 
-		//printf("a:%d %d\nb:%d %d\nc:%d %d\n", mid1x, mid1y, mid2x, mid2y, mid3x, mid3y);
-
-		//printf("cosa=%lf	cosb=%lf	cosc= %lf\n", cosa, cosb, cosc);
 		if (abs(p3x - p1x) <= col / 150 && abs(p3y - p1y) <= row / 150 && abs(p3x - p2x) <= col / 150 && abs(p3y - p2y) <= row / 150)
 		{
-			//printf("a:%d %d\nb:%d %d\nc:%d %d\n", mid1x, mid1y, mid2x, mid2y, mid3x, mid3y);
-
-			//printf("cosa=%lf	cosb=%lf	cosc= %lf\n", cosa, cosb, cosc);
-
 		}
 		else continue;
 		double p = 0.25;
 		if (cosa<p && cosa>-p || cosb<p && cosb>-p || cosc<p && cosc>-p)
-		{//printf("%d..\n", i);
+		{
 			return i;
 			break;
 		}
@@ -497,6 +454,7 @@ void QRLocation::read(Mat a)
 
 QRLocation::QRLocation(Mat src)//输入图片
 {
+	getQR = false;
 	ans = new char[(numberofblock) * (numberofblock)];
 	memset(ans, 0, (numberofblock) * (numberofblock));
 	if (src.empty()) {
@@ -505,6 +463,7 @@ QRLocation::QRLocation(Mat src)//输入图片
 	}
 	if (location2(src))
 	{
+		getQR = true;
 		end_correct(fsrc);
 		read(dst);
 	}
@@ -513,7 +472,10 @@ QRLocation::QRLocation(Mat src)//输入图片
 QRList QRLocation::get()
 {
 	QRList list;
-	QRMatrix matrix(ans, numberofblock, numberofblock);
-	list.append(matrix);
+	if (getQR)
+	{
+		QRMatrix matrix(ans, numberofblock, numberofblock);
+		list.append(matrix);
+	}
 	return list;
 }

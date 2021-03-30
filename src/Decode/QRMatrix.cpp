@@ -11,6 +11,7 @@ QRMatrix::QRMatrix(int width, int height)
 }
 QRMatrix::QRMatrix(char* data, int width, int height)
 {
+	matrix = nullptr;
 	resize(width, height);
 	matrix = data;
 }

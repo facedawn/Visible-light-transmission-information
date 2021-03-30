@@ -12,14 +12,18 @@ using namespace cv;
 class QRCode
 {
 	DataBuffer* buffer;
+	unsigned int byte;
 
 	QRList locationQR(Mat img);
 
 	void fixPoint(int& x, int& y);
+	void QRCodeBasic();
 	bool versionCheck(QRMatrix &matrix);
 	bool sizeCheck(QRMatrix& matrix);
-	bool EffectivenessCheck(QRMatrix& matrix);
-	void read(QRMatrix& matrix);
+	void Xor(QRMatrix& matrix);
+
+	bool EffectivenessCheck(QRMatrix& matrix, int& x, int& y);
+	void read(QRMatrix& matrix, int& x, int& y);
 public:
 	QRCode();
 	QRCode(DataBuffer* dataBuffer);

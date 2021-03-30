@@ -21,7 +21,7 @@ bool Video::loadfile(string _filename)
 	filename = _filename;
 
 	Mat frame;
-	VideoCapture cap(filename.data());
+	VideoCapture cap(filename);
 	if (!cap.isOpened())
 		return false;
 

@@ -80,15 +80,44 @@ bool data2Video();
 
 解码模块。
 
+Main.cpp文件并非必须，可以将自己所写的独立的Main.cpp文件替代它。
+
+使用本项目的时候仅需要引用Decode.h即可
+
+```c++
+#include "Decode.h"
+```
+
+
+
 ### 使用说明
 
 #### 环境配置
 
-暂无
+Visual Studio的安装配置参考：[Visual Studio 2019安装与使用](https://zhuanlan.zhihu.com/p/94998894)
+
+环境配置参考：[VisualStudio2019安装配置OpenCV的C++环境](https://www.jianshu.com/p/5aef93bdc45c)
 
 #### 接口说明
 
-暂无
+Decode模块提供了三个构造函数
+
+```c++
+Decode();
+Decode(string _outputFilename, string _filename);
+```
+
+第一个为默认构造方法。
+
+第二个提供了两个参数，分别指向要输出的文件地址与要解码的视频文件地址
+
+Encode模块提供了一个方法
+
+```c++
+bool video2Data();
+```
+
+这一个函数便是整个项目的核心，利用视频解码出二进制数据。
 
 ### 版本信息
 

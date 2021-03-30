@@ -2,8 +2,32 @@
 
 DataBuffer::DataBuffer()
 {
+	now = 0;
+	total = 0;
 	buffer.clear();
 }
+int DataBuffer::getNow()
+{
+	return now;
+}
+int DataBuffer::getTotal()
+{
+	return total;
+}
+void DataBuffer::setNow(int n)
+{
+	now = n;
+}
+void DataBuffer::setTotal(int t)
+{
+	total = t;
+}
+bool DataBuffer::isEnd()
+{
+	return !(now < total);
+}
+
+
 void DataBuffer::append(char tmp)
 {
 	buffer.push_back(tmp);
@@ -27,5 +51,11 @@ bool DataBuffer::isEmpty()
 }
 void DataBuffer::clear()
 {
+	now = 0;
+	total = 0;
 	buffer.clear();
+}
+int DataBuffer::size()
+{
+	return buffer.size();
 }

@@ -9,7 +9,7 @@
 #include "QRList.h"
 #include "GlobalMacroDefine.h"
 #define numberofblock (NumberofColorBlocks + 4)
-#define numberofpoint 342
+#define numberofpoint 825
 
 using namespace cv;
 using namespace std;
@@ -23,6 +23,7 @@ struct po
 class QRLocation
 {
 	char* ans;
+	bool getQR;
 	Point2f vertexs_minRect_QR[4]; //记录二维码的四个点
 
 	void SobelEnhance(const Mat src, Mat& dst);
