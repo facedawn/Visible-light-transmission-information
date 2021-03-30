@@ -1,17 +1,5 @@
 #include "QRLocation.h"
 
-Mat src, src_gray;
-Mat dst, detected_edges;
-Mat fsrc;
-
-int edgeThresh = 1;
-int lowThreshold = 50;
-int const max_lowThreshold = 100;
-int ratioo = 3;
-int kernel_size = 3;
-
-int ccc = 1;//1为不留边缘 ，0为保留大块边缘
-
 bool po_cmp(po a, po b)
 {
 	if (a.maxx - a.minx != b.maxx - b.minx)
@@ -37,7 +25,7 @@ double dis(Point a, Point b)
 	return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
-Point base;//基准点，必为凸包上一点，且其余所有点都在该点右边
+Point base;
 bool cmp(Point a, Point b)//根据该点与基准点的连线和水平线所成的夹角排序
 {
 	double tana, tanb;
@@ -73,8 +61,6 @@ void findbase(vector<Point>& a)
 vector<Point> find_tubao(vector<Point>& a)
 {
 	vector<Point> result;
-	//findbase(a);
-	//sort(a.begin() + 1, a.end(), cmp);
 	result.push_back(a[0]);
 	int top = 0, cnt = a.size();
 	for (int i = 1; i < cnt; i++)
@@ -88,6 +74,9 @@ vector<Point> find_tubao(vector<Point>& a)
 	}
 	return result;
 }
+
+//以上代码均为求凸包的相关函数，对于组成轮廓的点集进行一次筛选
+
 
 void QRLocation::SobelEnhance(const Mat src, Mat& dst)
 {
@@ -103,37 +92,33 @@ void QRLocation::SobelEnhance(const Mat src, Mat& dst)
 	addWeighted(img_edgeFiltex, 1, img_edgeFiltey, 1, 0, dst);
 }
 
-void QRLocation::CannyThreshold(int, void*)
+
+void QRLocation::canny(Mat a)
 {
+	QRLocation_src = a;
+	QRLocation_src.copyTo(QRLocation_fsrc);
+
+	if (QRLocation_src.type() != CV_8UC1)
+		cvtColor(QRLocation_src, QRLocation_src_gray, COLOR_BGR2GRAY);//转灰度图
+	else
+		QRLocation_src.copyTo(QRLocation_src_gray);
+
+
+	int edgeThresh = 1;
+	int lowThreshold = 50;
+	int const max_lowThreshold = 100;
+	int ratioo = 3;
+	int kernel_size = 3;
+
 	equalizeHist(detected_edges, detected_edges);//直方图均衡化，增加像素灰度值的动态范围，达到增强图像整体对比度的效果
 
 
-	GaussianBlur(src_gray, detected_edges, Size(7, 7), 0, 0);
-	threshold(src_gray, detected_edges, 150, 255, THRESH_BINARY);
+	GaussianBlur(QRLocation_src_gray, detected_edges, Size(7, 7), 0, 0);//高斯降噪，降噪核大小应根据图片尺寸进行相应更改
+	threshold(QRLocation_src_gray, detected_edges, 150, 255, THRESH_BINARY);
 	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold * ratioo, kernel_size);
 
 	cv::dilate(detected_edges, detected_edges, cv::Mat());//膨胀
 	cv::dilate(detected_edges, detected_edges, cv::Mat());//膨胀
-
-	dst = Scalar::all(0);
-
-	src.copyTo(dst, detected_edges);
-
-}
-
-void QRLocation::canny(Mat a)
-{
-	src = a;
-	src.copyTo(fsrc);
-
-
-	dst.create(src.size(), src.type());//创建和img相同大小的图
-	if (src.type() != CV_8UC1)
-		cvtColor(src, src_gray, COLOR_BGR2GRAY);//转灰度图
-	else
-		src.copyTo(src_gray);
-	CannyThreshold(0, 0);
-	waitKey(0);
 }
 
 string QRLocation::int2str(const int& int_temp)
@@ -145,10 +130,11 @@ string QRLocation::int2str(const int& int_temp)
 	return string_temp;
 }
 
-int QRLocation::find_point(vector<po>& s)//从候选点中找到三个,返回第一个的序号
+
+int QRLocation::find_point(vector<po>& s)
 {
 	int all = s.size();
-	int col = fsrc.cols, row = src.rows;
+	int col = QRLocation_src.cols, row = QRLocation_src.rows;
 	for (int i = 0; i + 2 < all; i++)
 	{
 		int p1x, p2x, p3x, p1y, p2y, p3y, mid1x, mid1y, mid2x, mid2y, mid3x, mid3y;
@@ -193,6 +179,7 @@ int QRLocation::find_point(vector<po>& s)//从候选点中找到三个,返回第一个的序号
 
 }
 
+
 void QRLocation::find4j()
 {
 	Point2f mid = Point2f(0, 0);
@@ -220,20 +207,19 @@ void QRLocation::find4j()
 			swap(vertexs_minRect_QR[i], vertexs_minRect_QR[1]);
 		}
 	}
-	if (ccc == 0)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			vertexs_minRect_QR[i] += (vertexs_minRect_QR[i] - mid) / 10;
-		}
-	}
 }
+
 
 bool QRLocation::location2(Mat a)
 {
 	canny(a);
 
 	vector<vector<Point>> contours;
+	
+	vector<int> vector_contours_filter;//其中存放定位点的候选
+	vector<Point> vertex_minRect4;//装有三个定位点共12个顶点的容器
+	vector<po>s;//存储定位点信息
+
 	vector<Vec4i> hierarchy;
 	//hierarchy为2维的，hierarchy[i][k]代表第i个轮廓的第k个索引，对应contours中的序号，不存在则为-1
 	//	k==0--该轮廓同级的后一个轮廓
@@ -242,7 +228,7 @@ bool QRLocation::location2(Mat a)
 	//	k==3--该轮廓的父轮廓
 	//输入图像，轮廓（点向量形式），轮廓数量，轮廓检索模式，轮廓逼近 
 	findContours(detected_edges, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point(0, 0));
-	vector<int> vector_contours_filter;//其中存放定位点的候选
+	
 	for (int k, c, i = 0; i < contours.size(); i++)
 	{
 		k = i;
@@ -261,49 +247,37 @@ bool QRLocation::location2(Mat a)
 		}
 	}
 
-
-	vector<Point> vertex_minRect4;//装有三个定位点共12个顶点的容器
 	if ((vector_contours_filter.size() < 3))//如果没有找到足够的定位点
 	{
 		printf("The picture does not meet the requirements\n");
-		printf("cnt=%d\n", vector_contours_filter.size());
 		return false;
 	}
 	int all = vector_contours_filter.size();
-	vector<po>s;//存储定位点信息
-	/*string start = "out", end = ".jpg";*/
+	
 	for (int j = 0; j < all; j++)
 	{
-
 		po q;
 		q.minx = 1e9, q.miny = 1e9, q.maxx = 0, q.maxy = 0;
 		q.i = vector_contours_filter[j];
 		q.d = find_tubao(contours[vector_contours_filter[j]]);
-		//q.d = contours[vector_contours_filter[j]];
-		approxPolyDP(q.d, q.d, 2, true);
-
 		int cnt = q.d.size();
+
+		if (cnt > 4)
+			approxPolyDP(q.d, q.d, 2, true);
+
+		cnt = q.d.size();
+		
 		if (cnt < 4)continue;
 		for (int i = 0; i < cnt; i++)//把确定下来的矩形顶点丢进去
 		{
-			//int temp = contours[vector_contours_filter[0]].size() / 4;
 			q.minx = min(q.minx, q.d[i].x);
 			q.miny = min(q.miny, q.d[i].y);
 			q.maxx = max(q.maxx, q.d[i].x);
 			q.maxy = max(q.maxy, q.d[i].y);
-			//printf("%d %d\n", contours[vector_contours_filter[j]][i].x, contours[vector_contours_filter[j]][i].y);
 		}
-		//printf("\n%d\n", vector_contours_filter[0]);
-		/*Mat temp;
-		temp = src(Range(q.miny, q.maxy), Range(q.minx, q.maxx));
-		string path = start + int2str(j) + end;
-		imwrite(path, temp);*/
-		//show(temp);
-		//q.d = contours[vector_contours_filter[j]];
 		s.push_back(q);
 	}
-	//sort(s.begin(), s.end(),po_cmp);//排序，找相近的
-	sort(s.begin(), s.end(), po_cmp);
+	sort(s.begin(), s.end(),po_cmp);//排序，找相近的
 	int ans = -1;
 	ans = find_point(s);//返回三个候选点的第一个的序号
 	if (ans == -1)
@@ -312,14 +286,20 @@ bool QRLocation::location2(Mat a)
 		return false;
 	}
 	vector<Point>res_contours;
-
-	res_contours = contours[hierarchy[s[ans].i][3]];
-
-	//res_contours = find_tubao(res_contours);
+	if (hierarchy[s[ans].i][3] != -1)//找到定位点的父轮廓
+	{
+		res_contours = contours[hierarchy[s[ans].i][3]];
+	}
+	else
+	{
+		printf("not match\n");
+		return false;
+	}
 
 	approxPolyDP(res_contours, res_contours, 50, true);
 
 	vector<Point2f>point_minRect12;
+
 	for (int i = 0; i < 4; i++)
 	{
 		Point2f temp = Point2f((double)res_contours[i].x, (double)res_contours[i].y);
@@ -328,7 +308,6 @@ bool QRLocation::location2(Mat a)
 	for (int j = 0; j < 4; j++)
 	{
 		vertexs_minRect_QR[j] = point_minRect12[j];
-		//line(src, point_minRect12[j], point_minRect12[(j + 1) % 4], Scalar(0, 0, 255), 1, 8);
 	}
 
 	Point2f midPoint_rect;
@@ -338,22 +317,8 @@ bool QRLocation::location2(Mat a)
 		midPoint_rect.x += (point_minRect12[j].x / 4);
 		midPoint_rect.y += (point_minRect12[j].y / 4);
 	}
-	//circle(src, midPoint_rect, 10, Scalar(0, 255, 0), 3, 8);
-	//src.copyTo(fsrc);
 	int f = 0;
-	/*for (int i = 0; i < 4; i++)
-	{
-		if (vertexs_minRect_QR[i].x > midPoint_rect.x && vertexs_minRect_QR[i].y > midPoint_rect.y)
-		{
-			f = i;
-		}
-	}
-	for (int i = 0; i < 4; i++)
-	{
-		vertexs_minRect_QR[i] = point_minRect12[(i + 4 - f)%4];
-	}*/
 	find4j();
-	//cout << vertexs_minRect_QR[0] << "  " << vertexs_minRect_QR[1] << "  " << vertexs_minRect_QR[2] << "  " << vertexs_minRect_QR[3] << "  " << endl;
 
 	f = 6;
 	for (int i = ans; i < ans + 3; i++)
@@ -375,31 +340,17 @@ bool QRLocation::location2(Mat a)
 			f -= 1;
 		}
 	}
-	//printf("f=%d\n", f); cout << vertexs_minRect_QR[0] << "    " << midPoint_rect << endl;
-	Point2f temp1 = vertexs_minRect_QR[(2 + 0 + f) % 4];
-	Point2f temp2 = vertexs_minRect_QR[(3 + 0 + f) % 4];
-	Point2f temp3 = vertexs_minRect_QR[(0 + 0 + f) % 4];
-	Point2f temp0 = vertexs_minRect_QR[(1 + 0 + f) % 4];
+	Point2f temp1 = vertexs_minRect_QR[(2 + f) % 4];
+	Point2f temp2 = vertexs_minRect_QR[(3 + f) % 4];
+	Point2f temp3 = vertexs_minRect_QR[(0 + f) % 4];
+	Point2f temp0 = vertexs_minRect_QR[(1 + f) % 4];
 
 	vertexs_minRect_QR[0] = temp0;
 	vertexs_minRect_QR[1] = temp1;
 	vertexs_minRect_QR[2] = temp2;
 	vertexs_minRect_QR[3] = temp3;
-
-	//cout << vertexs_minRect_QR[0] << "    " << midPoint_rect << endl;
-
-	//cout << vertexs_minRect_QR[0] << "  " << vertexs_minRect_QR[1] << "  " << vertexs_minRect_QR[2] << "  " << vertexs_minRect_QR[3] << "  " << endl;
-	//int col = src.cols, row = src.rows;
-	//while (col > 1000 || row > 1000)
-	//{
-	//	col *= 0.99;
-	//	row *= 0.99;
-	//}
-	//resize(src, src, Size(col, row));
-
-	//show(src);
-
 }
+
 
 void QRLocation::end_correct(Mat f)
 {
@@ -408,24 +359,19 @@ void QRLocation::end_correct(Mat f)
 	vertex_warp[1] = Point2f(0, float(lenth - 1));
 	vertex_warp[2] = Point2f(0, 0);
 	vertex_warp[3] = Point2f(float(lenth - 1), 0);
-	vertex_warp[0] = Point2f(float(lenth - 1), float(lenth));
-	//find4j();
+	vertex_warp[0] = Point2f(float(lenth - 1), float(lenth - 1));
 	Mat transform = getPerspectiveTransform(vertexs_minRect_QR, vertex_warp);
-	//show(f);
-	warpPerspective(f, dst, transform, Size(lenth, lenth));//dst中为初次切割下来的二维码
+	warpPerspective(f, QRLocation_dst, transform, Size(lenth, lenth));//QRLocation_dst中为初次切割下来的二维码
 }
 
 void QRLocation::read(Mat a)
 {
 	cvtColor(a, a, COLOR_RGB2GRAY);
-	//show(a);
 	int pointOfeachBlock = numberofpoint / numberofblock;
 	for (int i = 0; i < numberofblock; i++)
 	{
 		for (int j = 0; j < numberofblock; j++)
 		{
-
-			circle(a, Point2f(i * pointOfeachBlock, j * pointOfeachBlock), 1, Scalar(255, 0, 0));
 			int cnt = 0;
 			for (int ii = i * pointOfeachBlock; ii < (i + 1) * pointOfeachBlock; ii++)
 			{
@@ -436,27 +382,25 @@ void QRLocation::read(Mat a)
 						cnt++;//记录黑像素点的个数
 				}
 			}
-			//printf("%d %d: %d\n", i, j, cnt);
 			if ((double)cnt / (pointOfeachBlock * pointOfeachBlock) > 0.5)//黑块多
 			{
-				//printf("%d ", cnt);
 				ans[i * (numberofblock)+j] = 1;
 			}
 			else
 			{
 				ans[i * numberofblock + j] = 0;
 			}
-			//fprintf(fp, "%d ", ans[i][j]);
-
 		}
 	}
 }
 
+
 QRLocation::QRLocation(Mat src)//输入图片
 {
-	getQR = false;
-	ans = new char[(numberofblock) * (numberofblock)];
-	memset(ans, 0, (numberofblock) * (numberofblock));
+	double second;
+	clock_t s_time, e_time;
+	s_time = clock();
+
 	if (src.empty()) {
 		//检查是否读取图像
 		printf("Error! Input image cannot be read...\n");
@@ -464,10 +408,12 @@ QRLocation::QRLocation(Mat src)//输入图片
 	if (location2(src))
 	{
 		getQR = true;
-		end_correct(fsrc);
-		read(dst);
+		end_correct(QRLocation_fsrc);
+		read(QRLocation_dst);
 	}
+
 }
+
 
 QRList QRLocation::get()
 {
