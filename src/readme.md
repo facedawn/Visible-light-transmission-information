@@ -68,31 +68,9 @@ bool data2Video();
 
 第二个函数便是整个项目的核心，利用数据生成视频。
 
+### 版本信息
 
-
-### 更新日志
-
-#### 0.2
-
-##### 发布时间：
-
-2021/3/26
-
-##### 说明：
-
-因为解码需求，修改编码存储格式。
-
-
-
-#### 0.1
-
-##### 发布时间：
-
-2021/3/21
-
-##### 说明：
-
-基本完成编码模块，压缩与纠错码仍旧未能完成。
+详见：[版本信息](https://github.com/facedawn/Visible-light-transmission-information/blob/main/src/encodeVersion.md)
 
 
 
@@ -102,14 +80,17 @@ bool data2Video();
 
 解码模块。
 
+### 使用说明
 
+#### 环境配置
+
+暂无
 
 #### 接口说明
 
 暂无
 
+### 版本信息
 
+详见：[版本信息](https://github.com/facedawn/Visible-light-transmission-information/blob/main/src/decodeVersion.md)
 
-### 更新日志
-
-尚未有发布版本
