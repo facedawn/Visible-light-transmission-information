@@ -1,5 +1,9 @@
 # Visible-light-transmission-information
 
+这里是测试版本，实验新功能加强稳定性。
+
+
+
 ## 基本介绍
 
 计算机网络课程项目库（未完成）
