@@ -1,8 +1,6 @@
 # Visible-light-transmission-information
 
-这里是测试版本，实验新功能加强稳定性。
-
-
+这里是稳定版
 
 ## 基本介绍
 
