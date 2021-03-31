@@ -1,3 +1,7 @@
+# 请勿把Beta分支合并到main！！
+
+
+
 # Visible-light-transmission-information
 
 这里是测试版本，实验新功能加强稳定性。
