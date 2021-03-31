@@ -13,12 +13,13 @@ int main(int argc, char** argv) {
 	cout << "请输入输出文件地址：";
 	string output;
 	cin >> output;
+	Decode decode(output, video);
+
 	//===========================
 	double second;
 	clock_t s_time, e_time;
 	s_time = clock();
 
-	Decode decode(output, video);
 	int size = decode.video2Data(); //核心
 
 	e_time = clock();
