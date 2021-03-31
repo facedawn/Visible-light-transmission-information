@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <windows.h>
+#include <cstdio>
 
 using namespace std;
 
@@ -37,8 +38,8 @@ int main()
 
     cout << endl;
     cout << endl;
-    cout << "文件1位数：" << len1 * 8 << endl;
-    cout << "文件2位数：" << len2 * 8 << endl;
+    cout << "文件1字节数：" << len1 << endl;
+    cout << "文件2字节数：" << len2 << endl;
 
     int firstWrongByte = 0;
     int index = 0;
@@ -53,35 +54,26 @@ int main()
         tmp2[0] = 0;
         in1.read(tmp, 1);
         in2.read(tmp2, 1);
-
-        int pow = 1;
-        int times = 0;
-        for (int i = 0; i < 8; i++)
+        if (tmp[0] != tmp2[0])
         {
-            if ((tmp[0] & pow) != (tmp2[0] & pow))
-            {
-                wrong++;
-                int a = ((tmp[0] & pow) == pow) ? 1 : 0;
-                int b = ((tmp2[0] & pow) == pow) ? 1 : 0;
-                cout << "错误 " << wrong << "\t位置 " << index << "(" << times << ")\t:\t" << a << " (对比文件)\t " << b << "(原文件)\n";
-            }
-            pow *= 2;
-            times++;
+            wrong++;
+            cout << "错误 " << wrong << "\t位置 " << index << "\t:\t" << (int)(unsigned char)tmp[0] << " (对比文件)\t " << (int)(unsigned char)tmp2[0] << "(原文件)\n";
         }
-
         delete[] tmp;
         delete[] tmp2;
 
         if (wrong == 0)
             firstWrongByte++;
     }
+    in1.close();
+    in2.close();
 
     cout << endl;
     if (wrong > 0)
         printf("第一个错误的字节标号：%d", firstWrongByte);
     cout << endl;
-    cout << "错误位数：" << wrong << endl;
-    cout << "正确率：" << (double)(len2 * 8 - wrong) / (double)(len2 * 8) << endl;
+    cout << "错误字节数：" << wrong << endl;
+    cout << "正确率：" << (double)(len2 - wrong) / (double)len2 << endl;
     system("pause");
     return 0;
 }
