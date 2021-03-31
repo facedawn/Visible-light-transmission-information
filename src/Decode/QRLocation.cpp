@@ -364,23 +364,40 @@ void QRLocation::end_correct(Mat f)
 	warpPerspective(f, QRLocation_dst, transform, Size(lenth, lenth));//QRLocation_dst中为初次切割下来的二维码
 }
 
+
+
+
+
 void QRLocation::read(Mat a)
 {
 	cvtColor(a, a, COLOR_RGB2GRAY);
+	//threshold(a, a, 170, 255,THRESH_BINARY);
 	int pointOfeachBlock = numberofpoint / numberofblock;
-	for (int i = 0; i < numberofblock; i++)
+	int py = 0; int i, j; int gray_sum = 0;
+	for (i = 0; i < numberofblock; i++)
 	{
-		for (int j = 0; j < numberofblock; j++)
+		py = 0;
+		for (j = 0; j < numberofblock; j++)
 		{
-			int cnt = 0;
+			int cnt = 0; int gray_cnt = 0;
+			line(a, Point(i * pointOfeachBlock, (j) * (pointOfeachBlock + py / (numberofblock - 2))), Point((i + 1) * pointOfeachBlock, (j) * (pointOfeachBlock + py / (numberofblock - 2))), Scalar(0, 255, 0));
+			line(a, Point(i * pointOfeachBlock, (j) * (pointOfeachBlock + py / (numberofblock - 2))), Point((i) * pointOfeachBlock, (j + 1) * (pointOfeachBlock + py / (numberofblock - 2))), Scalar(0, 255, 0));
 			for (int ii = i * pointOfeachBlock; ii < (i + 1) * pointOfeachBlock; ii++)
 			{
 				uchar* data = a.ptr<uchar>(ii);
-				for (int jj = j * pointOfeachBlock; jj < (j + 1) * pointOfeachBlock; jj++)
+				for (int jj = j * (pointOfeachBlock + py / (numberofblock - 2)); jj < (j + 1) * (pointOfeachBlock + py / (numberofblock - 2)); jj++)
 				{
-					if (data[jj] < 150)
+					if (data[jj] < 85)
 						cnt++;//记录黑像素点的个数
+					if (data[jj] >= 85 && data[jj] < 170)
+					{
+						gray_cnt++;
+					}
 				}
+			}
+			if ((double)gray_cnt / (pointOfeachBlock * pointOfeachBlock) > 0.5)
+			{
+				gray_sum++;
 			}
 			if ((double)cnt / (pointOfeachBlock * pointOfeachBlock) > 0.5)//黑块多
 			{
@@ -388,19 +405,24 @@ void QRLocation::read(Mat a)
 			}
 			else
 			{
-				ans[i * numberofblock + j] = 0;
+				ans[i * (numberofblock) + j] = 0;
+			}
+			if (j == 2 && ans[i * numberofblock + j] == 1)
+			{
+				py = -(double)cnt / pointOfeachBlock;
 			}
 		}
 	}
+	if (gray_sum > 15)
+		getQR = false;
 }
 
 
 QRLocation::QRLocation(Mat src)//输入图片
 {
-	double second;
-	clock_t s_time, e_time;
-	s_time = clock();
-
+	getQR = false;
+	ans = new char[(numberofblock) * (numberofblock)];
+	memset(ans, 0, (numberofblock) * (numberofblock));
 	if (src.empty()) {
 		//检查是否读取图像
 		printf("Error! Input image cannot be read...\n");
@@ -411,7 +433,6 @@ QRLocation::QRLocation(Mat src)//输入图片
 		end_correct(QRLocation_fsrc);
 		read(QRLocation_dst);
 	}
-
 }
 
 
