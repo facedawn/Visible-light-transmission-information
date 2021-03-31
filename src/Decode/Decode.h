@@ -17,6 +17,6 @@ class Decode
 public:
 	Decode();
 	Decode(string _outputFilename, string _filename);
-	bool video2Data();
+	int video2Data();
 };
 

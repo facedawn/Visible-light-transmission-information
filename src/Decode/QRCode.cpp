@@ -247,12 +247,16 @@ bool QRCode::EffectivenessCheck(QRMatrix& matrix, int& x, int& y)
 			writeSize += pow;
 		pow *= 2;
 	}
+#ifdef DEBUG
 	printf("reading:page:%d\ttotal page:%d\twrite byte:%d\n", page, pageTotle, writeSize);
+#endif
 
 	buffer->setTotal((buffer->getTotal() < pageTotle) ? pageTotle : buffer->getTotal());
 	if (page >= buffer->getNow()) 
 	{
+#ifdef DEBUG
 		printf("Valid read!!!\n");
+#endif
 		if(page - buffer->getNow() > 0)
 			printf("lost %d pages!!\n", page - buffer->getNow());
 		buffer->setNow(page + 1);
@@ -261,7 +265,9 @@ bool QRCode::EffectivenessCheck(QRMatrix& matrix, int& x, int& y)
 	}
 	else
 	{
+#ifdef DEBUG
 		printf("ignore\n");
+#endif
 		return false;
 	}
 }
