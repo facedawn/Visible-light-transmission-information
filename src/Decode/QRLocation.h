@@ -10,7 +10,7 @@
 #include "GlobalMacroDefine.h"
 #define blockNumberOfWhite 2 
 #define numberofblock (NumberofColorBlocks + 2*blockNumberOfWhite)
-#define numberofpoint numberofblock*15
+#define numberofpoint numberofblock*4
 
 
 using namespace cv;

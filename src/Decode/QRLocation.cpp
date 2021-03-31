@@ -354,7 +354,7 @@ bool QRLocation::location2(Mat a)
 
 void QRLocation::end_correct(Mat f)
 {
-	int lenth = 826;
+	int lenth = numberofpoint + 1;
 	Point2f vertex_warp[4];
 	vertex_warp[1] = Point2f(0, float(lenth - 1));
 	vertex_warp[2] = Point2f(0, 0);
