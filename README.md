@@ -32,22 +32,6 @@
 
 
 
-## 文件结构
-
-### Pirvate
-
-存放各组员独立完成的部分
-
-### release
-
-最新发布的版本
-
-### src
-
-项目完整源代码
-
-
-
 ## 版本信息
 
 详见：[版本信息](https://github.com/facedawn/Visible-light-transmission-information/blob/main/src/readme.md)
