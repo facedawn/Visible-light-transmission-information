@@ -14,6 +14,7 @@ class Decode
 	string videoFilename;
 	string outputFilename;
 	DataBuffer buffer;
+	Video video;
 public:
 	Decode();
 	Decode(string _outputFilename, string _filename);

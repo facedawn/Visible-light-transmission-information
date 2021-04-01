@@ -37,5 +37,7 @@ int main(int argc, char** argv) {
 	else
 		cout << "由于未知原因打开失败！" << endl;
 
+	string tmp;
+	cin >> tmp; //暂停
 	return 0;
 }

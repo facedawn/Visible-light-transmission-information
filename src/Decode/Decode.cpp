@@ -10,11 +10,11 @@ Decode::Decode(string _output, string _filename)
 
 	videoFilename = _filename;
 	outputFilename = _output;
+	video.loadfile(videoFilename);
 }
 
 int Decode::video2Data()
 {
-	Video video(videoFilename);
 	if (video.size() == 0)
 		return -1;
 

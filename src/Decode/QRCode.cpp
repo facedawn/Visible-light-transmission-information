@@ -41,7 +41,7 @@ void QRCode::setBuffer(DataBuffer* dataBuffer)
 	buffer = dataBuffer;
 }
 
-QRList QRCode::locationQR(Mat img)
+QRList QRCode::locationQR(Mat& img)
 {
 	//定位二维码的位置
 	QRLocation location(img);
@@ -58,14 +58,6 @@ bool QRCode::decode(Mat img)
 	QRList QRlist = locationQR(img);
 	for (int i = 0; i < QRlist.size(); i++)
 	{
-		//for (int h = 0; h < QRlist[i].height(); h++) 
-		//{
-		//	for (int w = 0; w < QRlist[i].width(); w++) 
-		//	{
-		//		printf("%d ", QRlist[i].at(h, w));
-		//	}
-		//	printf("\n");
-		//}
 		if (versionCheck(QRlist[i]) && sizeCheck(QRlist[i]))
 		{
 			Xor(QRlist[i]);
