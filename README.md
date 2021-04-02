@@ -1,4 +1,9 @@
 # Visible-light-transmission-information
+
+这里是稳定版
+
+## 基本介绍
+
 计算机网络课程项目库（未完成）
 内部应该含有两个程序：1.根据用户给出的信息以及自定义编码生成视频；2.根据含有生成视频的视频，读取出其蕴含的信息
 
@@ -18,3 +23,21 @@
 使用摄影工具获得包含视频1的视频2.
 
 再通过视频2获得视频1中包含的信息。
+
+## 功能说明
+
+该项目可以将任意类型的二进制文件编码为视频文件，通过摄像头传输到另外一台电脑上。
+
+具体使用说明详见：[使用说明](https://github.com/facedawn/Visible-light-transmission-information/blob/main/src/readme.md)
+
+
+
+## 版本信息
+
+详见：[版本信息](https://github.com/facedawn/Visible-light-transmission-information/blob/main/src/readme.md)
+
+
+
+## 授权信息
+
+详见：[授权信息](https://github.com/facedawn/Visible-light-transmission-information/blob/main/LICENSE)
