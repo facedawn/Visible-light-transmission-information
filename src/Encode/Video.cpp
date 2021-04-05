@@ -1,6 +1,6 @@
 #include "Video.h"
 
-#define Rate 10.0 //Ö¡ÂÊ
+#define Rate 20.0 //Ö¡ÂÊ
 
 
 Video::Video()
@@ -32,6 +32,10 @@ void Video::append(Mat tmp)
 void Video::clear()
 {
 	img.clear();
+}
+int Video::size()
+{
+	return img.size();
 }
 
 bool Video::saveVideo()

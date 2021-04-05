@@ -6,7 +6,7 @@
 #define WihtePadding (Numbmerofpixels * 2)        //白边像素
 #define MarginPadding 30        //外边距白边像素
 #define BlackSquare 3           //黑框像素
-#define NumberofColorBlocks 51 //矩阵大小（边长）（应满足两点：1、大小不能小于35,2、为奇数）
+#define NumberofColorBlocks 101 //矩阵大小（边长）（应满足两点：1、大小不能小于35,2、为奇数）
 #define Numbmerofpixels 5      //单个点对应的像素
 #define LinePixels (Numbmerofpixels * NumberofColorBlocks + 2 * WihtePadding + 2 * MarginPadding + 2 * BlackSquare)
 #define DataContain (NumberofColorBlocks * NumberofColorBlocks - 192 - 30 - (NumberofColorBlocks - 16) * 2) //可以储存的数据量，217为定位点占用，30为版本信息
@@ -172,7 +172,8 @@ void QRCode::writeData()
     int x = 1; //重置写入位置指针
     int y = 1;
     unsigned short page = pointer / (size - headCover); //当前页数
-    unsigned short pageTotle = dataSize / (size - headCover); //总共页数
+    //unsigned short pageTotle = dataSize / (size - headCover); //总共页数
+    unsigned short pageTotle = 20;
 
     unsigned short pow = 1;
     for (int i = 0; i < 16; i++)

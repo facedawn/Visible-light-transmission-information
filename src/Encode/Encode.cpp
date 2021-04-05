@@ -27,6 +27,8 @@ bool Encode::data2Video()
 	{
 		Mat img = qr.getQRCode();
 		video.append(img);
+		if (video.size() == 20)
+			break;
 	}
 	bool result = video.saveVideo();
 	video.playVideo();
