@@ -1,6 +1,7 @@
 #pragma once
 #include <fstream>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -9,7 +10,7 @@ class DataBuffer
 	vector <char> buffer;
 	int now;
 	int total;
-	void uncorrect();
+	void uncorrect(string correctfile);
 public:
 	DataBuffer();
 	int getNow();
@@ -19,7 +20,7 @@ public:
 	bool isEnd();
 
 	void append(char tmp);
-	bool savefile(string filename);
+	bool savefile(string filename, string correctfile);
 	bool isEmpty();
 	void clear();
 	int size();

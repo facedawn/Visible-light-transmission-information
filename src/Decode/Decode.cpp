@@ -5,11 +5,12 @@ Decode::Decode()
 {
 
 }
-Decode::Decode(string _output, string _filename)
+Decode::Decode(string _videoFilename, string _outputFilename, string _correctFilename)
 {
 
-	videoFilename = _filename;
-	outputFilename = _output;
+	videoFilename = _videoFilename;
+	outputFilename = _outputFilename;
+	correctFilename = _correctFilename;
 	video.loadfile(videoFilename);
 }
 
@@ -35,6 +36,6 @@ int Decode::video2Data()
 		QRCode QR(&buffer);
 		QR.decode(video.nextImg());
 	}
-	buffer.savefile(outputFilename);
+	buffer.savefile(outputFilename, correctFilename);
 	return buffer.size();
 }

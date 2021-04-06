@@ -13,7 +13,10 @@ int main(int argc, char** argv) {
 	cout << "请输入输出文件地址：";
 	string output;
 	cin >> output;
-	Decode decode(output, video);
+	cout << "请输入输出矫正文件地址：";
+	string correct;
+	cin >> correct;
+	Decode decode(video, output, correct);
 
 	//===========================
 	double second;
