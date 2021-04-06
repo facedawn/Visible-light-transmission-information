@@ -9,6 +9,7 @@ class DataBuffer
 	vector <char> buffer;
 	int now;
 	int total;
+	void uncorrect();
 public:
 	DataBuffer();
 	int getNow();

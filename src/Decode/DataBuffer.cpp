@@ -34,6 +34,7 @@ void DataBuffer::append(char tmp)
 }
 bool DataBuffer::savefile(string filename)
 {
+	uncorrect();
 	ofstream out(filename.data(), ios::out | ios::binary);
 	if (!out)
 		return false;
@@ -58,4 +59,9 @@ void DataBuffer::clear()
 int DataBuffer::size()
 {
 	return buffer.size();
+}
+
+void DataBuffer::uncorrect()
+{
+
 }

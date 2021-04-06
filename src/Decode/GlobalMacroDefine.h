@@ -2,7 +2,7 @@
 
 //每边的长度
 #ifndef NumberofColorBlocks
-#define NumberofColorBlocks 51
+#define NumberofColorBlocks 101
 #endif // !NumberofColorBlocks
 
 //数据量
@@ -11,5 +11,5 @@
 #endif // !DataContain
 
 #ifndef DEBUG
-//#define DEBUG
+#define DEBUG
 #endif
