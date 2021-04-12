@@ -11,5 +11,5 @@
 #endif // !DataContain
 
 #ifndef DEBUG
-#define DEBUG
+//#define DEBUG
 #endif
