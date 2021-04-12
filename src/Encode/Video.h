@@ -19,6 +19,7 @@ public:
 	bool isEmpty();
 	void append(Mat tmp);
 	void clear();
+	int size();
 
 	bool saveVideo();
 	void playVideo();

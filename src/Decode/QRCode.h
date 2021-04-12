@@ -14,11 +14,11 @@ class QRCode
 	DataBuffer* buffer;
 	unsigned int byte;
 
-	QRList locationQR(Mat img);
+	QRList locationQR(Mat& img);
 
 	void fixPoint(int& x, int& y);
 	void QRCodeBasic();
-	bool versionCheck(QRMatrix &matrix);
+	bool versionCheck(QRMatrix& matrix);
 	bool sizeCheck(QRMatrix& matrix);
 	void Xor(QRMatrix& matrix);
 

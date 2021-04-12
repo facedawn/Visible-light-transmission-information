@@ -5,32 +5,37 @@ Decode::Decode()
 {
 
 }
-Decode::Decode(string _output, string _filename)
+Decode::Decode(string _videoFilename, string _outputFilename, string _correctFilename)
 {
 
-	videoFilename = _filename;
-	outputFilename = _output;
+	videoFilename = _videoFilename;
+	outputFilename = _outputFilename;
+	correctFilename = _correctFilename;
+	video.loadfile(videoFilename);
 }
 
-bool Decode::video2Data()
+int Decode::video2Data()
 {
-	Video video(videoFilename);
 	if (video.size() == 0)
-		return false;
+		return -1;
 
+#ifdef DEBUG
 	printf("\n\nTotal img:%d\n", video.size());
 	printf("%d\n", video.isEnd());
+#endif // !DEBUG
 
 	while (!video.isEnd())
 	{
 		//Mat img = video.nextImg();
 		//imshow("result", video.nextImg());
+#ifdef DEBUG
 		printf("\nnow:%d\ttotal:%d\n", video.pointer(), video.size());
+#endif
 		//waitKey(100);
 
 		QRCode QR(&buffer);
 		QR.decode(video.nextImg());
 	}
-	buffer.savefile(outputFilename);
-	return true;
+	buffer.savefile(outputFilename, correctFilename);
+	return buffer.size();
 }

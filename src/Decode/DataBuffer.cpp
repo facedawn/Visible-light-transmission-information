@@ -32,8 +32,9 @@ void DataBuffer::append(char tmp)
 {
 	buffer.push_back(tmp);
 }
-bool DataBuffer::savefile(string filename)
+bool DataBuffer::savefile(string filename, string correctfile)
 {
+	uncorrect(correctfile);
 	ofstream out(filename.data(), ios::out | ios::binary);
 	if (!out)
 		return false;
@@ -58,4 +59,13 @@ void DataBuffer::clear()
 int DataBuffer::size()
 {
 	return buffer.size();
+}
+
+void DataBuffer::uncorrect(string correctfile)
+{
+	ofstream out(correctfile.data(), ios::out | ios::binary);
+	const char tmp = -1; //先全部填写为1，表示全对。后期修改。
+	for (int i = 0; i < buffer.size(); i++)
+		out.write(&tmp, 1);
+	out.close();
 }

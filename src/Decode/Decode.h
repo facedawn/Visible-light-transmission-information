@@ -13,10 +13,12 @@ class Decode
 {
 	string videoFilename;
 	string outputFilename;
+	string correctFilename;
 	DataBuffer buffer;
+	Video video;
 public:
 	Decode();
-	Decode(string _outputFilename, string _filename);
-	bool video2Data();
+	Decode(string _videoFilename, string _outputFilename, string _correctFilename);
+	int video2Data();
 };
 

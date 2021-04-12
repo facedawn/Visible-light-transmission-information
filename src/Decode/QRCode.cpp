@@ -41,7 +41,7 @@ void QRCode::setBuffer(DataBuffer* dataBuffer)
 	buffer = dataBuffer;
 }
 
-QRList QRCode::locationQR(Mat img)
+QRList QRCode::locationQR(Mat& img)
 {
 	//定位二维码的位置
 	QRLocation location(img);
@@ -58,14 +58,6 @@ bool QRCode::decode(Mat img)
 	QRList QRlist = locationQR(img);
 	for (int i = 0; i < QRlist.size(); i++)
 	{
-		//for (int h = 0; h < QRlist[i].height(); h++) 
-		//{
-		//	for (int w = 0; w < QRlist[i].width(); w++) 
-		//	{
-		//		printf("%d ", QRlist[i].at(h, w));
-		//	}
-		//	printf("\n");
-		//}
 		if (versionCheck(QRlist[i]) && sizeCheck(QRlist[i]))
 		{
 			Xor(QRlist[i]);
@@ -247,12 +239,16 @@ bool QRCode::EffectivenessCheck(QRMatrix& matrix, int& x, int& y)
 			writeSize += pow;
 		pow *= 2;
 	}
+#ifdef DEBUG
 	printf("reading:page:%d\ttotal page:%d\twrite byte:%d\n", page, pageTotle, writeSize);
+#endif
 
 	buffer->setTotal((buffer->getTotal() < pageTotle) ? pageTotle : buffer->getTotal());
 	if (page >= buffer->getNow()) 
 	{
+#ifdef DEBUG
 		printf("Valid read!!!\n");
+#endif
 		if(page - buffer->getNow() > 0)
 			printf("lost %d pages!!\n", page - buffer->getNow());
 		buffer->setNow(page + 1);
@@ -261,7 +257,9 @@ bool QRCode::EffectivenessCheck(QRMatrix& matrix, int& x, int& y)
 	}
 	else
 	{
+#ifdef DEBUG
 		printf("ignore\n");
+#endif
 		return false;
 	}
 }
