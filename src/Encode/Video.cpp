@@ -1,7 +1,5 @@
 #include "Video.h"
 
-#define Rate 20.0 //Ö¡ÂÊ
-
 
 Video::Video()
 {
@@ -43,7 +41,7 @@ bool Video::saveVideo()
 	if (isEmpty())
 		return false;
 
-	VideoWriter video(filename, CAP_OPENCV_MJPEG, Rate, Size(img[0].cols, img[0].rows));
+	VideoWriter video(filename, CAP_OPENCV_MJPEG, RATE, Size(img[0].cols, img[0].rows));
 	for (int i = 0; i < img.size(); i++)
 		video << img[i];
 
@@ -64,7 +62,7 @@ void Video::playVideo()
 	while (cap.read(frame))
 	{
 		imshow("result", frame);
-		waitKey((int)(1000 / Rate));
+		waitKey((int)(1000 / RATE));
 	}
 	cap.release();
 	destroyAllWindows();

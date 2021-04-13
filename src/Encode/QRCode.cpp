@@ -70,7 +70,7 @@ bool QRCode::isEnd()
 }
 
 //生成二维码
-Mat QRCode::getQRCode()
+Mat QRCode::getQRCode(int length)
 {
     //初始化图片并赋值为白色
     Mat img(LinePixels, LinePixels, CV_8UC3, Scalar(255, 255, 255));
@@ -80,7 +80,7 @@ Mat QRCode::getQRCode()
     //cout << "可以储存的二进制位数：" << DataContain << endl;
 
     //写入数据
-    writeData();
+    writeData(length);
 
     //异或运算
     Xor();
@@ -157,7 +157,7 @@ void QRCode::QRCodeBasic()
 }
 
 //写入数据
-void QRCode::writeData()
+void QRCode::writeData(int length)
 {
     //二维码头将会占去8个字节，为了方便并未采用变长编码，后期若有时间可以优化
     const int headCover = 8;
@@ -173,7 +173,7 @@ void QRCode::writeData()
     int y = 1;
     unsigned short page = pointer / (size - headCover); //当前页数
     //unsigned short pageTotle = dataSize / (size - headCover); //总共页数
-    unsigned short pageTotle = 20;
+    unsigned short pageTotle = length;
 
     unsigned short pow = 1;
     for (int i = 0; i < 16; i++)
