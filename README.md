@@ -40,6 +40,8 @@
 
 
 
+可使用版本：[发布信息](https://github.com/facedawn/Visible-light-transmission-information/releases)
+
 ## 授权信息
 
 详见：[授权信息](https://github.com/facedawn/Visible-light-transmission-information/blob/main/LICENSE)
