@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="DataBuffer.h" />
     <ClInclude Include="Encode.h" />
+    <ClInclude Include="GlobalMacroDefine.h" />
     <ClInclude Include="QRCode.h" />
     <ClInclude Include="Video.h" />
   </ItemGroup>

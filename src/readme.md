@@ -45,15 +45,15 @@ Encode模块提供了三个构造函数
 
 ```c++
 Encode();
-Encode(string filename, string videoFilename);
-Encode(DataBuffer _buffer, string videoFilename);
+Encode(string filename, string videoFilename, int length, int argc);
+Encode(DataBuffer _buffer, string videoFilename, int length, int argc);
 ```
 
 第一个为默认构造方法。
 
-第二个提供了两个参数，分别指向要传输的文件地址与要输出的视频文件地址
+第二个提供了四个参数，分别指向要传输的文件地址与要输出的视频文件地址，视频长度，与输入的参数个数（最后这个主要是为了方便命令行使用，详见main函数内的调用方法）
 
-第三个提供了用户自定的一种方法（*主要用于传输非文件信息，传输用户自定的任何二进制信息*），第一个参数传入二进制数据缓冲类DataBuffer（*如果要使用该类需引入对应头文件*）。第二个参数为要输出的视频文件地址
+第三个提供了用户自定的一种方法（*主要用于传输非文件信息，传输用户自定的任何二进制信息*），第一个参数传入二进制数据缓冲类DataBuffer（*如果要使用该类需引入对应头文件*）。第二个参数为要输出的视频文件地址，后面两个参数同上。
 
 
 
@@ -104,12 +104,12 @@ Decode模块提供了三个构造函数
 
 ```c++
 Decode();
-Decode(string _outputFilename, string _filename);
+Decode(string _videoFilename, string _outputFilename, string _correctFilename);
 ```
 
 第一个为默认构造方法。
 
-第二个提供了两个参数，分别指向要输出的文件地址与要解码的视频文件地址
+第二个提供了三个参数，分别指向要输出的文件地址、要解码的视频文件地址、校验文件地址。
 
 Encode模块提供了一个方法
 

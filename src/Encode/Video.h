@@ -3,6 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <cstdio>
+#include "GlobalMacroDefine.h"
 
 using namespace std;
 using namespace cv;

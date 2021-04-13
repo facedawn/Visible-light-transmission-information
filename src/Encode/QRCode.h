@@ -13,7 +13,7 @@ class QRCode
 	DataBuffer* buffer;
 	void init();
 	void QRCodeBasic();
-	void writeData();
+	void writeData(int length);
 	void Xor();
 	void fixPoint(int& x, int& y);
 public:
@@ -21,7 +21,7 @@ public:
 	QRCode(DataBuffer* _buffer);
 	void setBuffer(DataBuffer* _buffer);
 
-	Mat getQRCode();
+	Mat getQRCode(int length);
 	bool isEnd();
 };
 

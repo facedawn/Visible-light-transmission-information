@@ -44,5 +44,8 @@
     <ClInclude Include="DataBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="GlobalMacroDefine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
